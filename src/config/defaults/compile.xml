@@ -12,6 +12,7 @@
 			<compile>%core.agavi_dir%/filter/AgaviIGlobalFilter.interface.php</compile>
 			<compile>%core.agavi_dir%/filter/AgaviIActionFilter.interface.php</compile>
 			<compile>%core.agavi_dir%/filter/AgaviFilter.class.php</compile>
+			<compile>%core.agavi_dir%/filter/AgaviActionExecutionFilter.class.php</compile>
 			<compile>%core.agavi_dir%/filter/AgaviDispatchFilter.class.php</compile>
 			<compile>%core.agavi_dir%/filter/AgaviExecutionFilter.class.php</compile>
 			<compile>%core.agavi_dir%/filter/AgaviFilterChain.class.php</compile>

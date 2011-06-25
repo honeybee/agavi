@@ -113,18 +113,21 @@
 			<autoload class="AgaviViewException">%core.agavi_dir%/exception/AgaviViewException.class.php</autoload>
 
 			<!-- agavi/filter -->
-			<autoload class="AgaviDispatchFilter">%core.agavi_dir%/filter/AgaviDispatchFilter.class.php</autoload>
-			<autoload class="AgaviExecutionFilter">%core.agavi_dir%/filter/AgaviExecutionFilter.class.php</autoload>
-			<autoload class="AgaviExecutionTimeFilter">%core.agavi_dir%/filter/AgaviExecutionTimeFilter.class.php</autoload>
-			<autoload class="AgaviFilter">%core.agavi_dir%/filter/AgaviFilter.class.php</autoload>
-			<autoload class="AgaviFilterChain">%core.agavi_dir%/filter/AgaviFilterChain.class.php</autoload>
-			<autoload class="AgaviFormPopulationFilter">%core.agavi_dir%/filter/AgaviFormPopulationFilter.class.php</autoload>
-			<autoload class="AgaviIActionFilter">%core.agavi_dir%/filter/AgaviIActionFilter.interface.php</autoload>
-			<autoload class="AgaviIFilter">%core.agavi_dir%/filter/AgaviIFilter.interface.php</autoload>
-			<autoload class="AgaviIGlobalFilter">%core.agavi_dir%/filter/AgaviIGlobalFilter.interface.php</autoload>
-			<autoload class="AgaviISecurityFilter">%core.agavi_dir%/filter/AgaviISecurityFilter.interface.php</autoload>
-			<autoload class="AgaviSecurityFilter">%core.agavi_dir%/filter/AgaviSecurityFilter.class.php</autoload>
-			<autoload class="AgaviTidyFilter">%core.agavi_dir%/filter/AgaviTidyFilter.class.php</autoload>
+			<autoload name="AgaviActionExecutionFilter">%core.agavi_dir%/filter/AgaviActionExecutionFilter.class.php</autoload>
+			<autoload name="AgaviAuthorizationFilter">%core.agavi_dir%/filter/AgaviAuthorizationFilter.class.php</autoload>
+			<autoload name="AgaviDispatchFilter">%core.agavi_dir%/filter/AgaviDispatchFilter.class.php</autoload>
+			<autoload name="AgaviExecutionFilter">%core.agavi_dir%/filter/AgaviExecutionFilter.class.php</autoload>
+			<autoload name="AgaviExecutionTimeFilter">%core.agavi_dir%/filter/AgaviExecutionTimeFilter.class.php</autoload>
+			<autoload name="AgaviFilter">%core.agavi_dir%/filter/AgaviFilter.class.php</autoload>
+			<autoload name="AgaviFilterChain">%core.agavi_dir%/filter/AgaviFilterChain.class.php</autoload>
+			<autoload name="AgaviFormPopulationFilter">%core.agavi_dir%/filter/AgaviFormPopulationFilter.class.php</autoload>
+			<autoload name="AgaviIActionFilter">%core.agavi_dir%/filter/AgaviIActionFilter.interface.php</autoload>
+			<autoload name="AgaviIFilter">%core.agavi_dir%/filter/AgaviIFilter.interface.php</autoload>
+			<autoload name="AgaviIGlobalFilter">%core.agavi_dir%/filter/AgaviIGlobalFilter.interface.php</autoload>
+			<autoload name="AgaviISecurityFilter">%core.agavi_dir%/filter/AgaviISecurityFilter.interface.php</autoload>
+			<autoload name="AgaviSecurityFilter">%core.agavi_dir%/filter/AgaviSecurityFilter.class.php</autoload>
+			<autoload name="AgaviTidyFilter">%core.agavi_dir%/filter/AgaviTidyFilter.class.php</autoload>
+			<autoload name="AgaviValidationFilter">%core.agavi_dir%/filter/AgaviValidationFilter.class.php</autoload>
 
 			<!-- agavi/logging -->
 			<autoload class="AgaviFileLoggerAppender">%core.agavi_dir%/logging/AgaviFileLoggerAppender.class.php</autoload>
