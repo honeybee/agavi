@@ -277,7 +277,9 @@ class AgaviException extends Exception
 		}
 		
 		// discard any previous output waiting in the buffer
-		while(@ob_end_clean());
+		while(ob_get_level() > 0) { 
+			ob_end_clean();
+		}
 		
 		if($container !== null && $container->getOutputType() !== null && $container->getOutputType()->getExceptionTemplate() !== null) { 
 			// an exception template was defined for the container's output type
