@@ -1025,7 +1025,7 @@ abstract class AgaviRouting extends AgaviParameterHolder
 	 */
 	public function gen($route, array $params = array(), $options = array())
 	{
-		if(array_key_exists('prefix', $options)) {
+		if(is_array($options) && array_key_exists('prefix', $options)) {
 			$prefix = (string) $options['prefix'];
 		} else {
 			$prefix = $this->getPrefix();
