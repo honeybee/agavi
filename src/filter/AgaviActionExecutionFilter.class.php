@@ -46,7 +46,7 @@ class AgaviActionExecutionFilter extends AgaviFilter
 	{
 		$actionInstance = $container->getActionInstance();
 		$request = $this->getContext()->getRequest();
-		$method = $request->getMethod();
+		$method = $container->getRequestMethod();
 		$requestData = $container->getRequestData();
 		
 		$useGenericMethods = false;
