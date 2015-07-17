@@ -33,24 +33,30 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	 * @var        array A List of result severities for each argument which has been validated.
 	 */
 	protected $argumentResults = array();
-	
+
 	/**
 	 * @var        int The highest error severity thrown by the validation run.
 	 */
 	protected $result = null;
-	
+
 	/**
 	 * @var        array The incidents which were thrown by the validation run.
 	 */
 	protected $incidents = array();
-	
+
+
+	/**
+	 * @var        array The depend tokens provided by the validation run.
+	 */
+	protected $providedDependTokens = array();
+
 	/**
 	 * Retrieves the highest validation result code in this report.
 	 *
 	 * @return     int An AgaviValidator::* severity constant, or null if there is
 	 *                 no result. Please remember to do a strict === comparison if
 	 *                 you are comparing against AgaviValidator::SUCCESS.
-	 * 
+	 *
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -58,12 +64,12 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		return $this->result;
 	}
-	
+
 	/**
 	 * Sets the validation result
-	 * 
+	 *
 	 * @param      int The new validation result
-	 * 
+	 *
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -71,10 +77,10 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		$this->result = $result;
 	}
-	
+
 	/**
 	 * Adds an incident to the validation result. This will automatically adjust
-	 * the argument result table (which is required because one can still 
+	 * the argument result table (which is required because one can still
 	 * manually add errors either via addError or by directly using this method)
 	 *
 	 * @param      AgaviValidationIncident The incident.
@@ -84,7 +90,7 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	 */
 	public function addIncident(AgaviValidationIncident $incident)
 	{
-		// we need to add the fields to our fieldresults if they don't exist there 
+		// we need to add the fields to our fieldresults if they don't exist there
 		// yet and adjust our result if needed (which only happens when this method
 		// is called not from a validator)
 		$severity = $incident->getSeverity();
@@ -98,9 +104,9 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 		}
 		$this->incidents[$validator ? $validator->getName() : ''][] = $incident;
 	}
-	
+
 	/**
-	 * Checks if any incidents occurred Returns all arguments which succeeded 
+	 * Checks if any incidents occurred Returns all arguments which succeeded
 	 * in the validation. Includes arguments which were not processed (happens
 	 *  when the argument is "not set" and the validator is not required)
 	 *
@@ -113,9 +119,9 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		return count($this->incidents) > 0;
 	}
-	
+
 	/**
-	 * Returns all incidents which happened during the execution of the 
+	 * Returns all incidents which happened during the execution of the
 	 * validation.
 	 *
 	 * @return     array The incidents.
@@ -131,13 +137,13 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 		}
 		return $incidents;
 	}
-	
+
 	/**
 	 * Adds a intermediate result of an validator for the given argument
 	 *
 	 * @param      AgaviValidationArgument The argument
 	 * @param      int    The arguments result.
-	 * @param      AgaviValidator The validator (if the error was cause inside 
+	 * @param      AgaviValidator The validator (if the error was cause inside
 	 *                            a validator).
 	 *
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
@@ -151,7 +157,21 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 			'validator' => $validator,
 		);
 	}
-	
+
+
+	/**
+	 * Adds dependency tokens provided by executed validators to the result.
+	 *
+	 * @param      AgaviDependencyManager
+	 *
+	 * @author     Steffen Gransow <agavi@mivesto.de>
+	 * @since      1.0.8
+	 */
+	public function addDependTokens(AgaviDependencyManager $dependencyManager)
+	{
+		$this->providedDependTokens = $dependencyManager->getDependTokens();
+	}
+
 	/**
 	 * Retrieve the internal array (indexed by argument hash) of
 	 * argument/severity/validator tuples.
@@ -170,7 +190,7 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		return $this->argumentResults;
 	}
-	
+
 	/**
 	 * Will return the highest error severity for an argument. If the field was
 	 * not "touched" by a validator null is returned. Can optionally be restricted
@@ -192,7 +212,7 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 		}
 
 		$severity = null;
-		
+
 		foreach($this->argumentResults[$argument->getHash()] as $result) {
 			if($validatorName === null || ($result['validator'] instanceof AgaviValidator && $result['validator']->getName() == $validatorName)) {
 				if(null === $severity) {
@@ -204,10 +224,10 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 
 		return $severity;
 	}
-	
+
 	/**
-	 * Checks whether an argument has been processed by a validator (this 
-	 * includes arguments which were skipped because their value was not set 
+	 * Checks whether an argument has been processed by a validator (this
+	 * includes arguments which were skipped because their value was not set
 	 * and the validator was not required)
 	 *
 	 * @param      AgaviValidationArgument The argument.
@@ -221,7 +241,7 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		return isset($this->argumentResults[$argument->getHash()]);
 	}
-	
+
 	/**
 	 * Checks whether an argument has failed in any validator.
 	 *
@@ -237,7 +257,7 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 		$severity = $this->getAuthoritativeArgumentSeverity($argument);
 		return ($severity > AgaviValidator::SUCCESS);
 	}
-	
+
 	/**
 	 * Returns all arguments which validated successfully.
 	 *
@@ -268,7 +288,7 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 
 		return $arguments;
 	}
-	
+
 	/**
 	 * Returns all arguments which failed in the validation.
 	 *
@@ -285,7 +305,7 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 		if($this->getResult() <= AgaviValidator::INFO) {
 			return array();
 		}
-		
+
 		$arguments = array();
 		foreach($this->argumentResults as $results) {
 			$hasInSource = false;
@@ -304,7 +324,7 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 
 		return $arguments;
 	}
-	
+
 	/**
 	 * Create a new AgaviValidationReportQuery for this report.
 	 *
@@ -317,17 +337,17 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		return new AgaviValidationReportQuery($this);
 	}
-	
+
 	/**
 	 * Returns a new AgaviIValidationReportQuery which returns only the incidents
 	 * for the given argument (and the other existing filter rules).
-	 * 
+	 *
 	 * @param      AgaviValidationArgument|string|array The argument instance, or
 	 *                                                  a parameter name, or an
 	 *                                                  array of these elements.
-	 * 
+	 *
 	 * @return     AgaviIValidationReportQuery
-	 * 
+	 *
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.0
@@ -336,15 +356,15 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		return $this->createQuery()->byArgument($argument);
 	}
-	
+
 	/**
 	 * Returns a new AgaviIValidationReportQuery which contains only the incidents
 	 * for the given validator (and the other existing filter rules).
-	 * 
+	 *
 	 * @param      string|array The name of the validator, or an array of names.
-	 * 
+	 *
 	 * @return     AgaviIValidationReportQuery
-	 * 
+	 *
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.0
@@ -353,15 +373,15 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		return $this->createQuery()->byValidator($name);
 	}
-	
+
 	/**
 	 * Returns a new AgaviIValidationReportQuery which contains only the incidents
 	 * for the given error name (and the other existing filter rules).
-	 * 
+	 *
 	 * @param      string|array The name of the error, or an array of names.
-	 * 
+	 *
 	 * @return     AgaviIValidationReportQuery
-	 * 
+	 *
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.0
@@ -370,15 +390,15 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		return $this->createQuery()->byErrorName($name);
 	}
-	
+
 	/**
 	 * Returns a new AgaviIValidationReportQuery which contains only the incidents
 	 * of the given severity or higher (and the other existing filter rules).
-	 * 
+	 *
 	 * @param      int The minimum severity.
-	 * 
+	 *
 	 * @return     AgaviIValidationReportQuery
-	 * 
+	 *
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.0
@@ -387,15 +407,15 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		return $this->createQuery()->byMinSeverity($minSeverity);
 	}
-	
+
 	/**
 	 * Returns a new AgaviIValidationReportQuery which contains only the incidents
 	 * of the given severity or lower (and the other existing filter rules).
-	 * 
+	 *
 	 * @param      int The maximum severity.
-	 * 
+	 *
 	 * @return     AgaviIValidationReportQuery
-	 * 
+	 *
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -403,12 +423,12 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		return $this->createQuery()->byMaxSeverity($maxSeverity);
 	}
-	
+
 	/**
 	 * Retrieves all AgaviValidationError objects in this report.
-	 * 
+	 *
 	 * @return     array An array of AgaviValidationError objects.
-	 * 
+	 *
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -416,12 +436,12 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		return $this->createQuery()->getErrors();
 	}
-	
+
 	/**
 	 * Retrieves all error messages in this report.
-	 * 
+	 *
 	 * @return     array An array of message strings.
-	 * 
+	 *
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -429,12 +449,12 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		return $this->createQuery()->getErrorMessages();
 	}
-	
+
 	/**
 	 * Retrieves all AgaviValidationArgument objects in this report.
-	 * 
+	 *
 	 * @return     array An array of AgaviValidationArgument objects.
-	 * 
+	 *
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -442,13 +462,13 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		return $this->createQuery()->getArguments();
 	}
-	
+
 	/**
 	 * Check if there are any incidents matching the currently defined filter
 	 * rules.
-	 * 
+	 *
 	 * @return     bool Whether or not any incidents exist in this report.
-	 * 
+	 *
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -456,12 +476,41 @@ class AgaviValidationReport implements AgaviIValidationReportQuery
 	{
 		return $this->createQuery()->has();
 	}
-	
+
+
+	/**
+	 * Check whether the given depend token was provided by the validation run.
+	 *
+	 * @param      string Name of depend token suspected to have been provided.
+	 *
+	 * @return     bool true if depend token was provided.
+	 *
+	 * @author     Steffen Gransow <agavi@mivesto.de>
+	 * @since      1.0.8
+	 */
+	public function hasDependToken($token)
+	{
+		return $this->createQuery()->hasDependToken($token);
+	}
+
+	/**
+	 * Check whether the given depend token was provided by the validation run.
+	 *
+	 * @return     Array of provided depend tokens.
+	 *
+	 * @author     Steffen Gransow <agavi@mivesto.de>
+	 * @since      1.0.8
+	 */
+	public function getDependTokens()
+	{
+		return $this->providedDependTokens;
+	}
+
 	/**
 	 * Get the number of incidents matching the currently defined filter rules.
-	 * 
+	 *
 	 * @return     int The number of incidents in this report.
-	 * 
+	 *
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.0
 	 */

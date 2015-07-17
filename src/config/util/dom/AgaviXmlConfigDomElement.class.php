@@ -492,6 +492,59 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 		
 		return $result;
 	}
+
+	/**
+	 * Check whether or not the element has Agavi errors as children.
+	 *
+	 * @return     bool True, if there are errors, false otherwise.
+	 *
+	 * @author     Jan Schütze <JanS@DracoBlue.de>
+	 * @author     Steffen Gransow <agavi@mivesto.de>
+	 *
+	 * @since      1.0.8
+	 */
+	public function hasAgaviErrors()
+	{
+		if($this->ownerDocument->isAgaviConfiguration()) {
+			return $this->has('errors', AgaviValidatorConfigHandler::XML_NAMESPACE);
+		}
+
+		return false;
+	}
+
+	/**
+	 * Retrieve all of the Agavi error elements associated with this
+	 * element.
+	 *
+	 * @param      array An array of existing errors.
+	 *
+	 * @return     array The complete array of errors.
+	 *
+	 * @author     Jan Schütze <JanS@DracoBlue.de>
+	 * @author     Steffen Gransow <agavi@mivesto.de>
+	 *
+	 * @since      1.0.8
+	 */
+	public function getAgaviErrors(array $existing = array())
+	{
+		$result = $existing;
+		$offset = 0;
+
+		if($this->ownerDocument->isAgaviConfiguration()) {
+			$elements = $this->get('errors', AgaviValidatorConfigHandler::XML_NAMESPACE);
+
+			foreach($elements as $element) {
+				$key = '';
+				if($element->hasAttribute('for')) {
+					$key = $element->getAttribute('for');
+				}
+
+				$result[$key] = $element->getValue();
+			}
+		}
+
+		return $result;
+	}
 }
 
 ?>

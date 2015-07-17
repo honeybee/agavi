@@ -185,9 +185,45 @@ class AgaviTesting
 	 */
 	protected static function createSuite($name, array $suite) 
 	{
+		$base = ! isset($suite['base']) ? 'tests' : $suite['base'];
+		if(!AgaviToolkit::isPathAbsolute($base)) {
+			$base = AgaviConfig::get('core.testing_dir').'/'.$base;
+		}
 		$s = new $suite['class']($name);
+		if(!empty($suite['includes'])) {
+			foreach(
+				new RecursiveIteratorIterator(
+					new AgaviRecursiveDirectoryFilterIterator(
+						new RecursiveDirectoryIterator($base),
+						$suite['includes'],
+						$suite['excludes']
+					),
+					RecursiveIteratorIterator::CHILD_FIRST
+				) as $finfo) {
+
+				if($finfo->isFile()) {
+					$s->addTestFile($finfo->getPathName());
+				}
+			}
+		}
 		foreach($suite['testfiles'] as $file) {
-			$s->addTestFile('tests/'.$file);
+			if(!AgaviToolkit::isPathAbsolute($file)) {
+				$file = $base.'/'.$file;
+			}
+			$s->addTestFile($file);
+		}
+		foreach($suite['directories'] as $directoryPath) {
+			if(!AgaviToolkit::isPathAbsolute($directoryPath)) {
+				$absoluteDirectoryPath = $base.'/'.$directoryPath;
+			} else {
+				$absoluteDirectoryPath = $directoryPath;
+			}
+			foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($absoluteDirectoryPath)) as $filePath) {
+				if ($filePath->isDir() || !preg_match('~Test\.php$~', $filePath->getBasename())) {
+					continue;
+				}
+				$s->addTestFile($filePath->getPathName());
+			}
 		}
 		return $s;
 	}

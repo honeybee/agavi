@@ -427,7 +427,7 @@ class AgaviWebRouting extends AgaviRouting
 		}
 
 		if($options['fragment'] !== null) {
-			$retval .= '#' . $options['fragment'];
+			$retval .= '#' . $this->escapeOutputParameter($options['fragment']);
 		}
 
 		return $retval;

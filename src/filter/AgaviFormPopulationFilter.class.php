@@ -301,6 +301,18 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 		// an array of all validation incidents; errors inserted for fields or multiple fields will be removed in here
 		$allIncidents = $vr->getIncidents();
 
+		$skipXpaths = $this->getParameter('skip_xpaths', []);
+		$skipNodes = [];
+		if (is_array($skipXpaths) && count($skipXpaths) > 0) {
+			foreach ($skipXpaths as $skipXpath) {
+				foreach ($this->xpath->query($skipXpath) as $skipNode) {
+					if (!in_array($skipNode, $skipNodes, true)) {
+						$skipNodes[] = $skipNode;
+					}
+				}
+			}
+		}
+
 		foreach($forms as $form) {
 			if($populate instanceof AgaviParameterHolder) {
 				$action = preg_replace('/#.*$/', '', trim($form->getAttribute('action')));
@@ -411,7 +423,9 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 					$pname = $this->fromUtf8($pname, $encoding);
 				}
 
-				if($skip !== null && preg_match($skip, $pname . ($checkValue ? '[]' : ''))) {
+				if($skip !== null && preg_match($skip, $pname . ($checkValue ? '[]' : ''))
+					|| in_array($element, $skipNodes, true)
+				) {
 					// skip field
 					continue;
 				}
@@ -580,7 +594,22 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 
 			// now output the remaining incidents
 			// might include errors for cookies, headers and whatnot, but that is okay
-			if($this->insertErrorMessages($form, $errorMessageRules, $allIncidents)) {
+			if($this->insertErrorMessages($form, $errorMessageRules, $allIncidents) && count($allIncidents)) {
+				// go over all the elements in the error class map
+				foreach($cfg['error_class_map'] as $xpathExpression => $errorClassName) {
+					// evaluate each xpath expression
+					$errorClassResults = $this->xpath->query(AgaviToolkit::expandVariables($xpathExpression, array('htmlnsPrefix' => $this->xmlnsPrefix)), $form);
+					if($errorClassResults && $errorClassResults->length) {
+						// we have results. the xpath expressions are used to locale the actual elements we set the error class on - doesn't necessarily have to be the erroneous element or the label!
+						foreach($errorClassResults as $errorClassDestinationElement) {
+							$errorClassDestinationElement->setAttribute('class', preg_replace('/\s*$/', ' ' . $errorClassName, $errorClassDestinationElement->getAttribute('class')));
+						}
+
+						// and break the foreach, our expression matched after all - no need to look further
+						break;
+					}
+				}
+
 				$allIncidents = array();
 			}
 		}

@@ -1739,7 +1739,19 @@ abstract class AgaviRouting extends AgaviParameterHolder
 		$value->initialize($this->context);
 		return $value;
 	}
-	
+
+       /**
+        * Returns the first execution container from routing.
+        *
+        * @return     AgaviExecutionContainer
+        *
+        * @author     Steffen Gransow <agavi@mivesto.de>
+        * @since      1.0.8
+        */
+       public function getContainer()
+       {
+               return $this->container;
+       }
 }
 
 ?>

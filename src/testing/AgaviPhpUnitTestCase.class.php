@@ -219,7 +219,8 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 	protected function getTemplateFile()
 	{
 		if($this->doBootstrap()) {
-			return AgaviConfig::get('core.agavi_dir') . DIRECTORY_SEPARATOR . 'testing' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'TestCaseMethod.tpl';
+            $defaultFile = AgaviConfig::get('core.agavi_dir') . DIRECTORY_SEPARATOR . 'testing' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'TestCaseMethod.tpl';
+            return AgaviConfig::get('core.test_bootstrap_tpl', $defaultFile);
 		}
 		
 		return null;

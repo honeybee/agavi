@@ -489,10 +489,20 @@ abstract class AgaviValidator extends AgaviParameterHolder
 			$this->affectedArguments = $affectedArguments;
 		}
 
+		$translationParameters = $this->getParameters();
+
+		if (count($this->affectedArguments) > 1) {
+			$translationParameters['arguments'] = implode(', ', $this->affectedArguments);
+		} elseif(isset($this->affectedArguments[0])) {
+			$translationParameters['argument'] = $this->affectedArguments[0];
+		}
+
 		$error = $this->getErrorMessage($index);
 
 		if($this->hasParameter('translation_domain')) {
-			$error = $this->getContext()->getTranslationManager()->_($error, $this->getParameter('translation_domain'));
+			$error = $this->getContext()->getTranslationManager()->_($error, $this->getParameter('translation_domain'), null, $translationParameters);
+		} else {
+			$error = $this->getContext()->getTranslationManager()->_($error, null, null, $translationParameters);
 		}
 
 		if(!$this->incident) {
@@ -527,7 +537,7 @@ abstract class AgaviValidator extends AgaviParameterHolder
 	 * @author     Dominik del Bondio <ddb@bitxtender.com>
 	 * @since      0.11.0
 	 */
-	protected function export($value, $name = null)
+	protected function export($value, $name = null, $paramType = null)
 	{
 		if($name === null) {
 			$name = $this->getParameter('export');
@@ -537,7 +547,10 @@ abstract class AgaviValidator extends AgaviParameterHolder
 			return;
 		}
 
+		if ($paramType === NULL)
+        {
 		$paramType = $this->getParameter('source');
+        }
 
 		$array =& $this->validationParameters->getAll($paramType);
 		$currentParts = $this->curBase->getParts();
@@ -559,10 +572,10 @@ abstract class AgaviValidator extends AgaviParameterHolder
 			if(is_array($value)) {
 				// for arrays all child elements need to be marked as not processed
 				foreach(AgaviArrayPathDefinition::getFlatKeyNames($value) as $keyName) {
-					$this->parentContainer->addArgumentResult(new AgaviValidationArgument($cp->pushRetNew($keyName)->__toString(), $this->getParameter('source')), AgaviValidator::SUCCESS, $this);
+					$this->parentContainer->addArgumentResult(new AgaviValidationArgument($cp->pushRetNew($keyName)->__toString(), $paramType), AgaviValidator::SUCCESS, $this);
 				}
 			}
-			$this->parentContainer->addArgumentResult(new AgaviValidationArgument($cp->__toString(), $this->getParameter('source')), AgaviValidator::SUCCESS, $this);
+			$this->parentContainer->addArgumentResult(new AgaviValidationArgument($cp->__toString(), $paramType), AgaviValidator::SUCCESS, $this);
 		}
 	}
 
