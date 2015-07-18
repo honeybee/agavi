@@ -34,27 +34,27 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 	 * @var        AgaviValidationReport
 	 */
 	protected $report;
-
+	
 	/**
 	 * @var        array
 	 */
 	protected $argumentFilter;
-
+	
 	/**
 	 * @var        array
 	 */
 	protected $errorNameFilter;
-
+	
 	/**
 	 * @var        array
 	 */
 	protected $validatorFilter;
-
+	
 	/**
 	 * @var        array|int
 	 */
 	protected $minSeverityFilter;
-
+	
 	/**
 	 * @var        array|int
 	 */
@@ -62,9 +62,9 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 
 	/**
 	 * Constructor.
-	 *
+	 * 
 	 * @param      AgaviValidationReport The validation report instance.
-	 *
+	 * 
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -72,17 +72,17 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 	{
 		$this->report = $report;
 	}
-
+	
 	/**
 	 * Returns a new AgaviIValidationReportQuery which returns only the incidents
 	 * for the given argument (and the other existing filter rules).
-	 *
+	 * 
 	 * @param      AgaviValidationArgument|string|array The argument instance, or
 	 *                                                  a parameter name, or an
 	 *                                                  array of these elements.
-	 *
+	 * 
 	 * @return     AgaviIValidationReportQuery
-	 *
+	 * 
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -104,15 +104,15 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 		$obj->argumentFilter = $argument;
 		return $obj;
 	}
-
+	
 	/**
 	 * Returns a new AgaviIValidationReportQuery which contains only the incidents
 	 * for the given validator (and the other existing filter rules).
-	 *
+	 * 
 	 * @param      string|array The name of the validator, or an array of names.
-	 *
+	 * 
 	 * @return     AgaviIValidationReportQuery
-	 *
+	 * 
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -125,15 +125,15 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 		$obj->validatorFilter = $name;
 		return $obj;
 	}
-
+	
 	/**
 	 * Returns a new AgaviIValidationReportQuery which contains only the incidents
 	 * for the given error name (and the other existing filter rules).
-	 *
+	 * 
 	 * @param      string|array The name of the error, or an array of names.
-	 *
+	 * 
 	 * @return     AgaviIValidationReportQuery
-	 *
+	 * 
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -146,15 +146,15 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 		$obj->errorNameFilter = $name;
 		return $obj;
 	}
-
+	
 	/**
 	 * Returns a new AgaviIValidationReportQuery which contains only the incidents
 	 * of the given severity or higher (and the other existing filter rules).
-	 *
+	 * 
 	 * @param      int The minimum severity.
-	 *
+	 * 
 	 * @return     AgaviIValidationReportQuery
-	 *
+	 * 
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -164,15 +164,15 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 		$obj->minSeverityFilter = $minSeverity;
 		return $obj;
 	}
-
+	
 	/**
 	 * Returns a new AgaviIValidationReportQuery which contains only the incidents
 	 * of the given severity or lower (and the other existing filter rules).
-	 *
+	 * 
 	 * @param      int The maximum severity.
-	 *
+	 * 
 	 * @return     AgaviIValidationReportQuery
-	 *
+	 * 
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -183,27 +183,26 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 		return $obj;
 	}
 
-
-       /**
-        * Check whether the given depend token was provided by the validation run.
-        *
-        * @param      string Name of depend token suspected to have been provided.
-        *
-        * @return     bool true if depend token was provided.
-        *
-        * @author     Steffen Gransow <agavi@mivesto.de>
-        * @since      1.0.8
-        */
-       public function hasDependToken($name)
-       {
+	/**
+	 * Check whether the given depend token was provided by the validation run.
+	 *
+	 * @param      string Name of depend token suspected to have been provided.
+	 *
+	 * @return     bool true if depend token was provided.
+	 *
+	 * @author     Steffen Gransow <agavi@mivesto.de>
+	 * @since      1.0.8
+	 */
+	public function hasDependToken($name)
+	{
         return array_key_exists($name, $this->report->getDependTokens());
-       }
-
+	}
+	
 	/**
 	 * Retrieves the incidents filtered with the current filter rules.
-	 *
+	 * 
 	 * @return     array
-	 *
+	 * 
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -229,7 +228,7 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 					continue;
 				}
 			}
-
+			
 			if($this->errorNameFilter) {
 				$hasErrorName = false;
 				foreach($incident->getErrors() as $error) {
@@ -242,29 +241,29 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 					continue;
 				}
 			}
-
+			
 			if($this->minSeverityFilter) {
 				if($incident->getSeverity() < $this->minSeverityFilter) {
 					continue;
 				}
 			}
-
+			
 			if($this->maxSeverityFilter) {
 				if($incident->getSeverity() > $this->maxSeverityFilter) {
 					continue;
 				}
 			}
-
+			
 			$resultIncidents[] = $incident;
 		}
 		return $resultIncidents;
 	}
-
+	
 	/**
 	 * Retrieves all incidents which match the currently defined filter rules.
-	 *
+	 * 
 	 * @return     array An array of AgaviValidationIncident objects.
-	 *
+	 * 
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -272,13 +271,13 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 	{
 		return $this->getFilteredIncidents();
 	}
-
+	
 	/**
 	 * Retrieves all AgaviValidationError objects which match the currently
 	 * defined filter rules.
-	 *
+	 * 
 	 * @return     array An array of AgaviValidationError objects.
-	 *
+	 * 
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -293,16 +292,16 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 				}
 			}
 		}
-
+		
 		return $errors;
 	}
-
+	
 	/**
 	 * Retrieves all error messages which match the currently defined filter
 	 * rules.
-	 *
+	 * 
 	 * @return     array An array of message strings.
-	 *
+	 * 
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -316,26 +315,25 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 		return $errorMessages;
 	}
 
-
-       /**
-        * Retrieves all depend tokens provided by the validation run.
-        *
-        * @return     array An array of provided depend tokens.
-        *
-        * @author     Steffen Gransow <agavi@mivesto.de>
-        * @since      1.0.8
-        */
-       public function getDependTokens()
-       {
-               return $this->report->getDependTokens();
-       }
-
+	/**
+	 * Retrieves all depend tokens provided by the validation run.
+	 *
+	 * @return     array An array of provided depend tokens.
+	 *
+	 * @author     Steffen Gransow <agavi@mivesto.de>
+	 * @since      1.0.8
+	 */
+	public function getDependTokens()
+	{
+		return $this->report->getDependTokens();
+	}
+	
 	/**
 	 * Retrieves all AgaviValidationArgument objects which match the currently
 	 * defined filter rules.
-	 *
+	 * 
 	 * @return     array An array of AgaviValidationArgument objects.
-	 *
+	 * 
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -352,14 +350,14 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 		}
 		return array_values($arguments);
 	}
-
+	
 	/**
 	 * Check if there are any incidents matching the currently defined filter
 	 * rules.
-	 *
+	 * 
 	 * @return     bool Whether or not any incidents exist for the currently
 	 *                  defined filter rules.
-	 *
+	 * 
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -367,13 +365,13 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 	{
 		return $this->count() > 0;
 	}
-
+	
 	/**
 	 * Get the number of incidents matching the currently defined filter rules.
-	 *
+	 * 
 	 * @return     int The number of incidents matching the currently defined
 	 *                 filter rules.
-	 *
+	 * 
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -381,7 +379,7 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 	{
 		return count($this->getIncidents());
 	}
-
+	
 	/**
 	 * Retrieves the highest validation result code of the collection composed of
 	 * the currently defined filter rules.
@@ -399,12 +397,12 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 		// if a filter for error names exist the result can't be success/not processed
 		// since if you have an error name the field must have thrown an error
 		$results = array();
-
+		
 		$arguments = array();
 		foreach($this->getArguments() as $argument) {
 			$arguments[$argument->getHash()] = $argument;
 		}
-
+		
 		// lets start by looking at the incidents, if we find any, lets return the max result
 		// (because since anything "below" an incident will have the same result as the incident, looking at the incidents is sufficient)
 		// if there is no result in the incidents, the field was either not touched at all by validation,
@@ -412,7 +410,7 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 		foreach($this->getIncidents() as $incident) {
 			$results[] = $incident->getSeverity();
 		}
-
+		
 		if($results) {
 			return max($results);
 		} elseif($this->errorNameFilter) {
@@ -447,11 +445,11 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 					}
 				}
 			}
-
+			
 			if(!$results) {
 				return null;
 			}
-
+			
 			$result = max($results);
 			if(($this->minSeverityFilter !== null && $result < $this->minSeverityFilter) || ($this->maxSeverityFilter !== null && $result > $this->maxSeverityFilter)) {
 				return null;

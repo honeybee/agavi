@@ -144,7 +144,7 @@ interface AgaviILogger
 	 * @param      string              An appender name.
 	 * @param      AgaviLoggerAppender An Appender instance.
 	 *
-	 * @throws     <b>AgaviLoggingException</b> If an appender with the name 
+	 * @throws     <b>AgaviLoggingException</b> If an appender with the name
 	 *                                          already exists.
 	 *
 	 * @author     Sean Kerr <skerr@mojavi.org>

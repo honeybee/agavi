@@ -104,19 +104,5 @@ class AgaviDependencyManager
 	{
 		return $this->depData;
 	}
-
-
-       /**
-        * Returns the list of provided tokens from the dependency cache.
-        *
-        * @return array of provided tokens from the dependency cache
-        *
-        * @author     Steffen Gransow <agavi@mivesto.de>
-        * @since      1.0.8
-        */
-       public function getDependTokens()
-       {
-               return $this->depData;
-       }
 }
 ?>

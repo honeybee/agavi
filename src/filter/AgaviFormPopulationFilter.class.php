@@ -214,7 +214,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 				$m = new $mc($lmsg, $severity);
 				$lm->log($m, $cfg['logging_logger']);
 			}
-			
+
 			// should we throw an exception, or carry on?
 			if($maxError > $cfg['ignore_parse_errors']) {
 				throw new AgaviParseException($emsg);
@@ -358,7 +358,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 				descendant::%1$sinput[@name and (not(@type="checkbox") or (not(contains(@name, "[]")) or (contains(@name, "[]") and @value)))]',
 				$this->xmlnsPrefix
 			);
-			
+
 			if(($formId = $form->hasAttribute('id')) != "") {
 				// find elements associated with this form as well
 				$query .= sprintf(' |
@@ -370,7 +370,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 					$formId
 				);
 			}
-			
+
 			foreach($this->xpath->query($query, $form) as $element) {
 
 				$pname = $name = $element->getAttribute('name');
@@ -436,7 +436,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 						? AgaviWebRequestDataHolder::SOURCE_FILES
 						: AgaviRequestDataHolder::SOURCE_PARAMETERS
 				);
-				
+
 				// there's an error with the element's name in the request? good. let's give the baby a class!
 				if($vr->getAuthoritativeArgumentSeverity($argument) > AgaviValidator::SILENT) {
 					// a collection of all elements that need an error class
@@ -466,7 +466,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 								foreach($errorClassResults as $errorClassDestinationElement) {
 									$errorClassDestinationElement->setAttribute('class', preg_replace('/\s*$/', ' ' . $errorClassName, $errorClassDestinationElement->getAttribute('class')));
 								}
-								
+
 								// and break the foreach, our expression matched after all - no need to look further
 								break;
 							}
@@ -550,14 +550,12 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 						}
 
 					} elseif($inputType != 'button' && $inputType != 'submit') {
-						
+
 						// everything else
-						
 						// unless "include_hidden_inputs" is false and it's a hidden input...
 						if($cfg['include_hidden_inputs'] || $inputType != 'hidden') {
 							// remove original value
 							$element->removeAttribute('value');
-							
 							// and set a new one if it's there and unless it's a password field (or we actually want to refill those)
 							if($p->hasParameter($pname) && ($cfg['include_password_inputs'] || $inputType != 'password')) {
 								$element->setAttribute('value', $value);
@@ -653,7 +651,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 						$reset[] = $attributeCopy;
 					}
 				}
-				
+
 				foreach($remove as $attribute) {
 					$this->doc->documentElement->removeAttributeNode($attribute);
 				}
@@ -710,7 +708,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 					$firstError = preg_last_error();
 				}
 			}
-			
+
 			if($firstError) {
 				$error = "Form Population Filter encountered an error while performing final regular expression replaces on the output.\n";
 				// the preg_replaces failed and produced an empty string. let's find out why
@@ -766,7 +764,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 				}
 			}
 		}
-		
+
 		if(!$errorMessages) {
 			// nothing to do here
 			return true;
@@ -891,7 +889,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 					// in case the target yielded more than one location, we need to clone the element
 					// because the document fragment node will be corrupted after an insert
 					$clonedErrorElement = $errorElement->cloneNode(true);
-					
+
 					if($errorLocation == 'before') {
 						$target->parentNode->insertBefore($clonedErrorElement, $target);
 					} elseif($errorLocation == 'after') {
@@ -1053,7 +1051,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 		if($ot = $this->getParameter('output_types')) {
 			$this->setParameter('output_types', (array) $ot);
 		}
-		
+
 		$savexmlOptions = 0;
 		foreach((array)$this->getParameter('savexml_options', array()) as $option) {
 			if(is_numeric($option)) {

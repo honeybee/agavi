@@ -1483,6 +1483,8 @@ abstract class AgaviRouting extends AgaviParameterHolder
 		// set the list of matched route names as a request attribute
 		$rq->setAttribute('matched_routes', $matchedRoutes, 'org.agavi.routing');
 
+		$this->container = $container;
+
 		// return a list of matched route names
 		return $container;
 	}
@@ -1739,19 +1741,20 @@ abstract class AgaviRouting extends AgaviParameterHolder
 		$value->initialize($this->context);
 		return $value;
 	}
-
-       /**
-        * Returns the first execution container from routing.
-        *
-        * @return     AgaviExecutionContainer
-        *
-        * @author     Steffen Gransow <agavi@mivesto.de>
-        * @since      1.0.8
-        */
-       public function getContainer()
-       {
-               return $this->container;
-       }
+	
+	/**
+	 * Returns the first execution container from routing.
+	 *
+	 * @return     AgaviExecutionContainer
+	 *
+	 * @author     Steffen Gransow <agavi@mivesto.de>
+	 * @since      1.0.8
+	 */
+	public function getContainer()
+	{
+		return $this->container;
+	}
+	
 }
 
 ?>

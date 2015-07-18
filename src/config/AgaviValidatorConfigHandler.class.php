@@ -175,6 +175,7 @@ class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 			}
 		}
 		
+		$errors = $this->classMap[$validator->getAttribute('class')]['errors'];
 		foreach($validator->get('errors') as $error) {
 			if($error->hasAttribute('for')) {
 				$errors[$error->getAttribute('for')] = $error->getValue();
@@ -250,14 +251,16 @@ class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 			if($validator->parentNode->localName == 'validators') {
 				$severity = $validator->parentNode->getAttribute('severity', $defaultSeverity);
 				$method = $validator->parentNode->getAttribute('method', $defaultMethod);
+				$translationDomain = $validator->parentNode->getAttribute('translation_domain', $defaultTranslationDomain);
 			} else {
 				$severity = $defaultSeverity;
 				$method = $defaultMethod;
+				$translationDomain = $defaultTranslationDomain;
 			}
 			$required = $defaultRequired;
 			
 			// append the code to generate
-			$code = $this->getValidatorArray($validator, $code, $name, $severity, $method, $required);
+			$code = $this->getValidatorArray($validator, $code, $name, $severity, $method, $required, $translationDomain);
 		}
 		
 		return $code;

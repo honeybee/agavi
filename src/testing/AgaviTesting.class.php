@@ -119,7 +119,6 @@ class AgaviTesting
 				if(empty($suites[$name])) {
 					throw new InvalidArgumentException(sprintf('Invalid suite name %1$s.', $name));
 				}
-				
 				$master_suite->addTest(self::createSuite($name, $suites[$name]));		
 			}
 				

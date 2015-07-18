@@ -47,7 +47,7 @@ class AgaviStreamTemplateLayer extends AgaviTemplateLayer
 			),
 		), $parameters));
 	}
-
+	
 	/**
 	 * Get the full, resolved stream location name to the template resource.
 	 *
@@ -61,12 +61,12 @@ class AgaviStreamTemplateLayer extends AgaviTemplateLayer
 	public function getResourceStreamIdentifier()
 	{
 		$template = $this->getParameter('template');
-
+		
 		if($template === null) {
 			// no template set, we return null so nothing gets rendered
 			return null;
 		}
-
+		
 		$args = array();
 		if(AgaviConfig::get('core.use_translation')) {
 			// i18n is enabled, build a list of sprintf args with the locale identifier
@@ -74,16 +74,16 @@ class AgaviStreamTemplateLayer extends AgaviTemplateLayer
 				$args[] = array('locale' => $identifier);
 			}
 		}
-
+		
 		$scheme = $this->getParameter('scheme');
 		// FIXME: a simple workaround for broken ubuntu and debian packages (fixed already), we can remove that for final 0.11
 		if($scheme != 'file' && !in_array($scheme, stream_get_wrappers())) {
 			throw new AgaviException('Unknown stream wrapper "' . $scheme . '", must be one of "' . implode('", "', stream_get_wrappers()) . '".');
 		}
 		$check = $this->getParameter('check');
-
+		
 		$attempts = array();
-
+		
 		// try each of the patterns
 		foreach((array)$this->getParameter('targets', array()) as $pattern) {
 			// try pattern with each argument list
@@ -99,7 +99,7 @@ class AgaviStreamTemplateLayer extends AgaviTemplateLayer
 				$attempts[] = $target;
 			}
 		}
-
+		
 		// no template found, time to throw an exception
 		throw new AgaviException('Template "' . $template . '" could not be found. Paths tried:' . "\n" . implode("\n", $attempts));
 	}
