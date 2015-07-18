@@ -322,7 +322,7 @@ final class AgaviToolkit
 		do {
 			$oldvalue = $value;
 			$value = preg_replace_callback(
-				'/\%([\w\.]+?)\%/',
+				'/\%([\w\.\-]+?)\%/',
 				array('AgaviToolkit', 'expandDirectivesCallback'),
 				$value
 			);
