@@ -1,6 +1,26 @@
 AGAVI CHANGELOG
 ===============
 
+Honeybee-1.1.x
+--------------
+
+Applied several patches that are somewhat between 1.0.8 and 1.1.0 as we're not caring as much as upstream about breaks.
+
+This includes:
+
+ADD: Allow errors in validator_definition elements (#1497) (Steffen Gransow)
+ADD: Add validation depend tokens to validation report (#1486) (Steffen Gransow, Dominik)
+ADD: BREAKING CHANGE: Allow 'translation_domain' attribute on <validators> (#1498) (Steffen Gransow, Dominik)
+ADD: Add "forms_xpath" setting to AgaviFormPopulationFilter (#1527) (Thomas Bachem)
+
+CHG: Improve AgaviFormPopulationFilter's "log_parse_errors" setting to handle severities (#1481) (Thomas Bachem)
+CHG: Improve AgaviFormPopulationFilter's error message callbacks (#1528) (Thomas Bachem, Steffen Gransow) 
+
+FIX: prevent additional template pattern lookup w/ i18n (#1491) (Steffen Gransow)
+
+…and more. At a later point we need to go back to the official master/1.1.0 instead of trying to cherry-pick stuff.
+
+
 1.0.8 (June 28, 2015)
 ---------------------
 
