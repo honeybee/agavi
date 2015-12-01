@@ -195,7 +195,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 				count($errors) > 1 ? 's' : '',
 				implode("\n", $errors)
 			);
-			if(AgaviConfig::get('core.use_logging') && $cfg['log_parse_errors']) {
+			if(AgaviConfig::get('core.use_logging') && $cfg['log_parse_errors'] && $maxError >= $cfg['log_parse_errors']) {
 				$severity = AgaviLogger::INFO;
 				switch($maxError) {
 					case LIBXML_ERR_WARNING:
@@ -295,7 +295,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 				}
 			}
 		} else {
-			$forms = $this->xpath->query(sprintf('//%1$sform[@action]', $this->xmlnsPrefix));
+			$forms = $this->xpath->query(AgaviToolkit::expandVariables($cfg['forms_xpath'], array('htmlnsPrefix' => $this->xmlnsPrefix)));
 		}
 
 		// an array of all validation incidents; errors inserted for fields or multiple fields will be removed in here
@@ -314,27 +314,35 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 		}
 
 		foreach($forms as $form) {
-			if($populate instanceof AgaviParameterHolder) {
-				$action = preg_replace('/#.*$/', '', trim($form->getAttribute('action')));
-				if(!(
-					$action == $rurl ||
-					(strpos($action, '/') === 0 && preg_replace(array('#/\./#', '#/\.$#', '#[^\./]+/\.\.(/|\z)#', '#/{2,}#'), array('/', '/', '', '/'), $action) == $ruri) ||
-					$baseHref . preg_replace(array('#/\./#', '#/\.$#', '#[^\./]+/\.\.(/|\z)#', '#/{2,}#'), array('/', '/', '', '/'), $action) == $rurl
-				)) {
-					continue;
-				}
-				$p = $populate;
-			} else {
-				if(isset($populate[$form->getAttribute('id')])) {
-					if($populate[$form->getAttribute('id')] instanceof AgaviParameterHolder) {
-						$p = $populate[$form->getAttribute('id')];
-					} elseif($populate[$form->getAttribute('id')] === true) {
-						$p = $rq->getRequestData();
+			if($form->tagName == 'form') {
+				if($populate instanceof AgaviParameterHolder) {
+					$action = preg_replace('/#.*$/', '', trim($form->getAttribute('action')));
+					if(!(
+						$action == $rurl ||
+						(strpos($action, '/') === 0 && preg_replace(array('#/\./#', '#/\.$#', '#[^\./]+/\.\.(/|\z)#', '#/{2,}#'), array('/', '/', '', '/'), $action) == $ruri) ||
+						$baseHref . preg_replace(array('#/\./#', '#/\.$#', '#[^\./]+/\.\.(/|\z)#', '#/{2,}#'), array('/', '/', '', '/'), $action) == $rurl
+					)) {
+						continue;
+					}
+					$p = $populate;
+				} else {
+					if(isset($populate[$form->getAttribute('id')])) {
+						if($populate[$form->getAttribute('id')] instanceof AgaviParameterHolder) {
+							$p = $populate[$form->getAttribute('id')];
+						} elseif($populate[$form->getAttribute('id')] === true) {
+							$p = $rq->getRequestData();
+						} else {
+							continue;
+						}
 					} else {
 						continue;
 					}
+				}
+			} else {
+				if($populate === true) {
+					$p = $rq->getRequestData();
 				} else {
-					continue;
+					$p = $populate;
 				}
 			}
 
@@ -423,9 +431,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 					$pname = $this->fromUtf8($pname, $encoding);
 				}
 
-				if($skip !== null && preg_match($skip, $pname . ($checkValue ? '[]' : ''))
-					|| in_array($element, $skipNodes, true)
-				) {
+				if($skip !== null && preg_match($skip, $pname . ($checkValue ? '[]' : '')) || in_array($element, $skipNodes, true)) {
 					// skip field
 					continue;
 				}
@@ -592,22 +598,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 
 			// now output the remaining incidents
 			// might include errors for cookies, headers and whatnot, but that is okay
-			if($this->insertErrorMessages($form, $errorMessageRules, $allIncidents) && count($allIncidents)) {
-				// go over all the elements in the error class map
-				foreach($cfg['error_class_map'] as $xpathExpression => $errorClassName) {
-					// evaluate each xpath expression
-					$errorClassResults = $this->xpath->query(AgaviToolkit::expandVariables($xpathExpression, array('htmlnsPrefix' => $this->xmlnsPrefix)), $form);
-					if($errorClassResults && $errorClassResults->length) {
-						// we have results. the xpath expressions are used to locale the actual elements we set the error class on - doesn't necessarily have to be the erroneous element or the label!
-						foreach($errorClassResults as $errorClassDestinationElement) {
-							$errorClassDestinationElement->setAttribute('class', preg_replace('/\s*$/', ' ' . $errorClassName, $errorClassDestinationElement->getAttribute('class')));
-						}
-
-						// and break the foreach, our expression matched after all - no need to look further
-						break;
-					}
-				}
-
+			if($this->insertErrorMessages($form, $errorMessageRules, $allIncidents)) {
 				$allIncidents = array();
 			}
 		}
@@ -659,19 +650,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 					$this->doc->documentElement->setAttributeNode($attribute);
 				}
 			}
-			if(strpos(PHP_VERSION, '5.2.6') === 0) { // check like this so 5.2.6-0.dotdeb.yourmom is also matched
-				// PHP 5.2.6 does not accept null as the first argument to saveXML()
-				// as a workaround, the whole document can be passed, but then it is saved as UTF-8, no matter what, so that won't work for other charsets
-				if(!$cfg['savexml_options']) {
-					$out = $this->doc->saveXML();
-				} elseif($utf8) {
-					$out = $this->doc->saveXML($this->doc, $cfg['savexml_options']);
-				} else {
-					throw new AgaviException("On systems running PHP version 5.2.6, the parameter 'savexml_options' cannot be used in combination with input documents that have a character set other than UTF-8. Please see the following tickets for details:\n\n- http://trac.agavi.org/ticket/1372\n- http://trac.agavi.org/ticket/1279\n- http://bugs.php.net/46191\n- http://trac.agavi.org/ticket/1262");
-				}
-			} else {
-				$out = $this->doc->saveXML(null, $cfg['savexml_options']);
-			}
+			$out = $this->doc->saveXML(null, $cfg['savexml_options']);
 			if((!$cfg['parse_xhtml_as_xml'] || !$properXhtml) && $cfg['cdata_fix']) {
 				// these are ugly fixes so inline style and script blocks still work. better don't use them with XHTML to avoid trouble
 				// http://www.456bereastreet.com/archive/200501/the_perils_of_using_xhtml_properly/
@@ -1035,6 +1014,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 			'methods'                    => array(),
 			'output_types'               => null,
 
+			'forms_xpath'                => '//${htmlnsPrefix}form[@action]',
 			'populate'                   => null,
 			'skip'                       => null,
 			'include_hidden_inputs'      => true,
@@ -1061,7 +1041,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 			'multi_field_error_messages' => array(),
 
 			'ignore_parse_errors'        => LIBXML_ERR_ERROR,
-			'log_parse_errors'           => true,
+			'log_parse_errors'           => LIBXML_ERR_WARNING,
 			'logging_logger'             => null,
 		));
 
@@ -1100,6 +1080,15 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 			$ignoreParseErrors = LIBXML_ERR_FATAL;
 		} elseif($ignoreParseErrors === false) {
 			$ignoreParseErrors = LIBXML_ERR_NONE;
+		}
+
+		$logParseErrors =& $this->getParameter('log_parse_errors');
+		if(is_string($logParseErrors) && defined($logParseErrors)) {
+			$logParseErrors = constant($logParseErrors);
+		}
+		// BC
+		if($logParseErrors === true) {
+			$logParseErrors = LIBXML_ERR_WARNING;
 		}
 
 		// and now copy all that to the request namespace so it can all be modified at runtime, not just overwritten
