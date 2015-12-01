@@ -195,7 +195,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 				count($errors) > 1 ? 's' : '',
 				implode("\n", $errors)
 			);
-			if(AgaviConfig::get('core.use_logging') && $cfg['log_parse_errors'] && $maxError >= $cfg['log_parse_errors']) {
+			if(AgaviConfig::get('core.use_logging') && $cfg['log_parse_errors'] !== false && $maxError >= $cfg['log_parse_errors']) {
 				$severity = AgaviLogger::INFO;
 				switch($maxError) {
 					case LIBXML_ERR_WARNING:
