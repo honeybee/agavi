@@ -32,8 +32,8 @@
  */
 class AgaviSettingConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/settings/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/settings/1.0';
+
 	/**
 	 * Execute this configuration handler.
 	 *
@@ -56,12 +56,12 @@ class AgaviSettingConfigHandler extends AgaviXmlConfigHandler
 	{
 		// set up our default namespace
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'settings');
-		
+
 		// init our data array
 		$data = array();
-		
+
 		$prefix = 'core.';
-		
+
 		foreach($document->getConfigurationElements() as $cfg) {
 			// let's do our fancy work
 			if($cfg->has('system_actions')) {
@@ -71,18 +71,18 @@ class AgaviSettingConfigHandler extends AgaviXmlConfigHandler
 					$data[sprintf('actions.%s_action', $name)] = $action->getChild('action')->getValue();
 				}
 			}
-			
+
 			// loop over <setting> elements; there can be many of them
 			foreach($cfg->get('settings') as $setting) {
 				$localPrefix = $prefix;
-				
+
 				// let's see if this buddy has a <settings> parent with valuable information
 				if($setting->parentNode->localName == 'settings') {
 					if($setting->parentNode->hasAttribute('prefix')) {
 						$localPrefix = $setting->parentNode->getAttribute('prefix');
 					}
 				}
-				
+
 				$settingName = $localPrefix . $setting->getAttribute('name');
 				if($setting->hasAgaviParameters()) {
 					$data[$settingName] = $setting->getAgaviParameters();
@@ -90,7 +90,7 @@ class AgaviSettingConfigHandler extends AgaviXmlConfigHandler
 					$data[$settingName] = $setting->getLiteralValue();
 				}
 			}
-			
+
 			if($cfg->has('exception_templates')) {
 				foreach($cfg->get('exception_templates') as $exception_template) {
 					$tpl = AgaviToolkit::expandDirectives($exception_template->getValue());

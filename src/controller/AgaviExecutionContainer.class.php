@@ -53,7 +53,7 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 	/**
 	 * @var        AgaviRequestDataHolder A request data holder with request info.
 	 */
-	protected $requestData = null; // TODO: check if this can actually be protected 
+	protected $requestData = null; // TODO: check if this can actually be protected
 	                               // or whether it should be private (would break actiontests though)
 
 	/**
@@ -121,18 +121,18 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 	 * (for sub-actions).
 	 */
 	const SANE_ACTION_NAME = '/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff\/.]*/';
-	
+
 	/**
 	 * View names may contain any valid PHP token, as well as dots and slashes
 	 * (for sub-actions).
 	 */
 	const SANE_VIEW_NAME   = '/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff\/.]*/';
-	
+
 	/**
 	 * Only valid PHP tokens are allowed in module names.
 	 */
 	const SANE_MODULE_NAME = '/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/';
-	
+
 	/**
 	 * Pre-serialization callback.
 	 *
@@ -146,7 +146,7 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 	{
 		$this->contextName = $this->context->getName();
 		if(!empty($this->outputType)) {
-			$this->outputTypeName = $this->outputType->getName();	
+			$this->outputTypeName = $this->outputType->getName();
 		}
 		$arr = get_object_vars($this);
 		unset($arr['context'], $arr['outputType'], $arr['requestData'], $arr['globalRequestData']);
@@ -165,11 +165,11 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 	public function __wakeup()
 	{
 		$this->context = AgaviContext::getInstance($this->contextName);
-		
+
 		if(!empty($this->outputTypeName)) {
 			$this->outputType = $this->context->getController()->getOutputType($this->outputTypeName);
 		}
-		
+
 		try {
 			$this->globalRequestData = $this->context->getRequest()->getRequestData();
 		} catch(AgaviException $e) {
@@ -225,12 +225,12 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 		if($requestMethod === null) {
 			$requestMethod = $this->getRequestMethod();
 		}
-		
+
 		$container = $this->context->getController()->createExecutionContainer($moduleName, $actionName, $arguments, $outputType, $requestMethod);
-		
+
 		// copy over parameters (could be is_slot, is_forward etc)
 		$container->setParameters($this->getParameters());
-		
+
 		return $container;
 	}
 
@@ -267,12 +267,12 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 			$this->setNext($this->createSystemActionForwardContainer('error_404'));
 			return $this->proceed();
 		} // do not catch AgaviClassNotFoundException, we want that to bubble up since it means the class in the action file is named incorrectly
-		
+
 		// copy and merge request data as required
 		$this->initRequestData();
-		
+
 		$filterChain = $this->getFilterChain();
-		
+
 		if(!$actionInstance->isSimple()) {
 			// simple actions have no filters
 
@@ -297,13 +297,13 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 
 		// process the filter chain
 		$filterChain->execute($this);
-		
+
 		return $this->proceed();
 	}
-	
+
 	/**
 	 * Copies and merges the global request data.
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 * @since        1.1.0
 	 */
@@ -326,7 +326,7 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 			}
 		}
 	}
-	
+
 	/**
 	 * Create a system forward container
 	 *
@@ -338,7 +338,7 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 	 * request (for legacy reasons)
 	 *
 	 *
-	 * @param      string          The type of forward to create (error_404, 
+	 * @param      string          The type of forward to create (error_404,
 	 *                             module_disabled, secure, login, unavailable).
 	 * @param      AgaviException  Optional exception thrown by the controller
 	 *                             while resolving the module/action.
@@ -353,7 +353,7 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 		if(!in_array($type, array('error_404', 'module_disabled', 'secure', 'login', 'unavailable'))) {
 			throw new AgaviException(sprintf('Unknown system forward type "%1$s"', $type));
 		}
-		
+
 		// track the requested module so we have access to the data in the error 404 page
 		$forwardInfoData = array(
 			'requested_module' => $this->getModuleName(),
@@ -361,27 +361,27 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 			'exception'        => $e,
 		);
 		$forwardInfoNamespace = 'org.agavi.controller.forwards.' . $type;
-		
+
 		$moduleName = AgaviConfig::get('actions.' . $type . '_module');
 		$actionName = AgaviConfig::get('actions.' . $type . '_action');
-		
+
 		if(false === $this->context->getController()->checkActionFile($moduleName, $actionName)) {
 			// cannot find unavailable module/action
 			$error = 'Invalid configuration settings: actions.%3$s_module "%1$s", actions.%3$s_action "%2$s"';
 			$error = sprintf($error, $moduleName, $actionName, $type);
-			
+
 			throw new AgaviConfigurationException($error);
 		}
-		
+
 		$forwardContainer = $this->createExecutionContainer($moduleName, $actionName);
-		
+
 		$forwardContainer->setAttributes($forwardInfoData, $forwardInfoNamespace);
 		// legacy
 		$this->context->getRequest()->setAttributes($forwardInfoData, $forwardInfoNamespace);
-		
+
 		return $forwardContainer;
 	}
-	
+
 	/**
 	 * Proceed to the "next" container by running it and returning its response,
 	 * or return our response if there is no "next" container.
@@ -429,7 +429,7 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 		}
 		return $this->validationManager;
 	}
-	
+
 	/**
 	 * Get the container's filter chain.
 	 *
@@ -444,10 +444,10 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 			$this->filterChain = $this->context->createInstanceFor('filter_chain');
 			$this->filterChain->setType(AgaviFilterChain::TYPE_ACTION);
 		}
-		
+
 		return $this->filterChain;
 	}
-	
+
 	/**
 	 * Execute the Action.
 	 *
@@ -461,27 +461,27 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 	{
 		$context = $this->getContext();
 		$controller = $context->getController();
-		
+
 		// create a new filter chain
 		$filterChain = $context->createInstanceFor('filter_chain');
-		
+
 		// register necessary filters
 		if(!$this->getActionInstance()->isSimple()) {
 			$filter = $controller->getFilter('validation');
-			$filterChain->register($filter);
+			$filterChain->register($filter, 'agavi_validation_filter');
 			$filter = $controller->getFilter('authorization');
-			$filterChain->register($filter);
+			$filterChain->register($filter, 'agavi_authorization_filter');
 		}
-		
+
 		$filter = $controller->getFilter('action_execution');
-		$filterChain->register($filter);
-		
+		$filterChain->register($filter, 'agavi_action_execution_filter');
+
 		// rock and roll
 		$filterChain->execute($this);
-		
+
 		return array($this->getViewModuleName(), $this->getViewName());
 	}
-	
+
 	/**
 	 * Resolve the name of the given View.
 	 *
@@ -518,12 +518,12 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 
 		return array($viewModule, $viewName === AgaviView::NONE ? AgaviView::NONE : AgaviToolkit::canonicalName($viewName));
 	}
-	
+
 	/**
 	 * Performs validation for this execution container.
-	 * 
+	 *
 	 * @return     bool true if the data validated successfully, false otherwise.
-	 * 
+	 *
 	 * @author     David Zülke <david.zuelke@bitxtender.com>
 	 * @author     Felix Gilcher <felix.gilcher@bitextender.com>
 	 * @since      1.0.0
@@ -538,7 +538,7 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 		$method = $this->getRequestMethod();
 
 		$requestData = $this->getRequestData();
-		
+
 		// set default validated status
 		$validated = true;
 
@@ -567,7 +567,7 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 
 	/**
 	 * Register validators for this execution container.
-	 * 
+	 *
 	 * @author     David Zülke <david.zuelke@bitxtender.com>
 	 * @author     Felix Gilcher <felix.gilcher@bitextender.com>
 	 * @since      1.0.0
@@ -578,11 +578,11 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 
 		// get the current action instance
 		$actionInstance = $this->getActionInstance();
-		
+
 		// get the current action information
 		$moduleName = $this->getModuleName();
 		$actionName = $this->getActionName();
-		
+
 		// get the (already formatted) request method
 		$method = $this->getRequestMethod();
 
@@ -608,7 +608,7 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 		}
 		$actionInstance->$registerValidatorsMethod();
 	}
-	
+
 	/**
 	 * Retrieve this container's request method name.
 	 *
@@ -769,16 +769,16 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 	{
 		if($this->actionInstance === null) {
 			$controller = $this->context->getController();
-			
+
 			$moduleName = $this->getModuleName();
 			$actionName = $this->getActionName();
-			
+
 			$this->actionInstance = $controller->createActionInstance($moduleName, $actionName);
-			
+
 			// initialize the action
 			$this->actionInstance->initialize($this);
 		}
-		
+
 		return $this->actionInstance;
 	}
 
@@ -798,7 +798,7 @@ class AgaviExecutionContainer extends AgaviAttributeHolder
 			// initialize the view
 			$this->viewInstance->initialize($this);
 		}
-		
+
 		return $this->viewInstance;
 	}
 

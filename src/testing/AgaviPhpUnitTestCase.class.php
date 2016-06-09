@@ -15,8 +15,8 @@
 
 /**
  * AgaviPhpUnitTestCase is the base class for all Agavi Testcases.
- * 
- * 
+ *
+ *
  * @package    agavi
  * @subpackage testing
  *
@@ -33,29 +33,29 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 	 * @var        string  the name of the environment to bootstrap in isolated tests.
 	 */
 	protected $isolationEnvironment;
-	
+
 	/**
 	 * @var        string  the name of the default context to use in isolated tests.
 	 */
 	protected $isolationDefaultContext;
-	
+
 	/**
 	 * @var         bool if the cache in the isolated process should be cleared
 	 */
 	protected $clearIsolationCache = false;
-	
+
 	/**
 	 * @var         string store the dataName since we can't access it from PHPUnit_Framework_TestCase.
 	 */
 	protected $myDataName;
-	
+
 	/**
 	 * Constructs a test case with the given name.
 	 *
 	 * @param        string
 	 * @param        array
 	 * @param        string
-	 * 
+	 *
 	 * @since        1.1.0
 	 */
 	public function __construct($name = NULL, array $data = array(), $dataName = '')
@@ -63,13 +63,13 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 		parent::__construct($name, $data, $dataName);
 		$this->myDataName = $dataName;
 	}
-	
-	
+
+
 	/**
 	 * set the environment to bootstrap in isolated tests
-	 * 
+	 *
 	 * @param        string the name of the environment
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 *
 	 * @since        1.0.0
@@ -78,13 +78,13 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 	{
 		$this->isolationEnvironment = $environmentName;
 	}
-	
-	
+
+
 	/**
 	 * get the environment to bootstrap in isolated tests
-	 * 
+	 *
 	 * @return       string the name of the isolation environment
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 *
 	 * @since        1.0.2
@@ -92,9 +92,9 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 	public function getIsolationEnvironment()
 	{
 		$environmentName = null;
-		
+
 		$annotations = $this->getAnnotations();
-		
+
 		if(!empty($annotations['method']['agaviIsolationEnvironment'])) {
 			$environmentName = $annotations['method']['agaviIsolationEnvironment'][0];
 		} elseif(!empty($annotations['class']['agaviIsolationEnvironment'])) {
@@ -102,16 +102,16 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 		} elseif(!empty($this->isolationEnvironment)) {
 			$environmentName = $this->isolationEnvironment;
 		}
-		
+
 		return $environmentName;
 	}
-	
-	
+
+
 	/**
 	 * set the default context to use in isolated tests
-	 * 
+	 *
 	 * @param        string the name of the context
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 *
 	 * @since        1.0.2
@@ -120,13 +120,13 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 	{
 		$this->isolationDefaultContext = $contextName;
 	}
-	
-	
+
+
 	/**
 	 * get the default context to use in isolated tests
-	 * 
+	 *
 	 * @return       string the default context to use in isolated tests
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 *
 	 * @since        1.0.2
@@ -134,9 +134,9 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 	public function getIsolationDefaultContext()
 	{
 		$ctxName = null;
-		
+
 		$annotations = $this->getAnnotations();
-		
+
 		if(!empty($annotations['method']['agaviIsolationDefaultContext'])) {
 			$ctxName = $annotations['method']['agaviIsolationDefaultContext'][0];
 		} elseif(!empty($annotations['class']['agaviIsolationDefaultContext'])) {
@@ -144,16 +144,16 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 		} elseif(!empty($this->isolationDefaultContext)) {
 			$ctxName = $this->isolationDefaultContext;
 		}
-		
+
 		return $ctxName;
 	}
-	
-	
+
+
 	/**
 	 * set whether the cache should be cleared for the isolated subprocess
-	 * 
+	 *
 	 * @param        bool true if the cache should be cleared
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 *
 	 * @since        1.0.2
@@ -162,13 +162,13 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 	{
 		$this->clearIsolationCache = (bool)$flag;
 	}
-	
-	
+
+
 	/**
 	 * check whether to clear the cache in isolated tests
-	 * 
+	 *
 	 * @return       bool true if the cache is cleared in isolated tests
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 *
 	 * @since        1.0.2
@@ -176,9 +176,9 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 	public function getClearCache()
 	{
 		$flag = null;
-		
+
 		$annotations = $this->getAnnotations();
-		
+
 		if(!empty($annotations['method']['agaviClearIsolationCache'])) {
 			$flag = true;
 		} elseif(!empty($annotations['class']['agaviClearIsolationCache'])) {
@@ -186,10 +186,10 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 		} else {
 			$flag = $this->clearIsolationCache;
 		}
-		
+
 		return $flag;
 	}
-	
+
 	/**
 	 * Retrieve the classes and defining files the given class depends on (including the given class)
 	 *
@@ -197,7 +197,7 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 	 * @param        callable A callback function which takes a file name as argument
 	 *                        and returns whether the file is blacklisted.
 	 *
-	 * @return       string[] An array containing class names as keys and path to the 
+	 * @return       string[] An array containing class names as keys and path to the
 	 *                        file's defining class as value.
 	 *
 	 * @author       Dominik del Bondio <dominik.del.bondio@bitextender.com>
@@ -205,7 +205,7 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 	 */
 	private function getClassDependendFiles(ReflectionClass $reflectionClass, $isBlacklisted) {
 		$requires = array();
-		
+
 		while($reflectionClass) {
 			$file = $reflectionClass->getFileName();
 			// we don't care for duplicates since we're using require_once anyways
@@ -227,26 +227,26 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 		}
 		return $requires;
 	}
-	
+
 	/**
 	 * Get the dependend classes of this test.
 	 *
-	 * @return       string[] An array containing class names as keys and path to the 
+	 * @return       string[] An array containing class names as keys and path to the
 	 *                        file's defining class as value.
 	 *
 	 * @author       Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since        1.1.0
 	 */
 	private function getDependendClasses() {
-		// We need to collect the dependend classes in case there is a test which 
+		// We need to collect the dependend classes in case there is a test which
 		// has set @agaviBootstrap to off. That results in the Agavi autoloader not
 		// being started and if the test class depends on any files from Agavi (like
 		// AgaviPhpUnitTestCase) it would not be loaded when the test is instantiated
-		
+
 		$classesInTest = array();
 		$reflectionClass = new ReflectionClass(get_class($this));
 		$testFile = $reflectionClass->getFileName();
-		
+
 		$getDeclaredFuncs = array('get_declared_classes', 'get_declared_interfaces');
 		if(version_compare(PHP_VERSION, '5.4', '>=')) {
 			$getDeclaredFuncs[] = 'get_declared_traits';
@@ -259,7 +259,7 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 				}
 			}
 		}
-		
+
 		// FIXME: added by phpunit 4.x
 		if(class_exists('PHPUnit_Util_Blacklist')) {
 			$blacklist = new PHPUnit_Util_Blacklist;
@@ -284,10 +284,10 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 				$this->getClassDependendFiles(new ReflectionClass($className), $isBlacklisted)
 			);
 		}
-		
+
 		return $classesToFile;
 	}
-	
+
 	/**
 	 * Performs custom preparations on the process isolation template.
 	 *
@@ -299,7 +299,7 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 	protected function prepareTemplate(Text_Template $template)
 	{
 		parent::prepareTemplate($template);
-		
+
 		// FIXME: workaround for php unit bug (https://github.com/sebastianbergmann/phpunit/pull/1338)
 		$template->setVar(array(
 			'dataName' => "'.(" . var_export($this->myDataName, true) . ").'"
@@ -320,9 +320,10 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 				}
 			});
 		', var_export($this->getDependendClasses(), true));
-		
-		// these constants are either used by out bootstrap wrapper script 
-		// (AGAVI_TESTING_ORIGINAL_PHPUNIT_BOOTSTRAP) or can be used by the user's 
+
+
+		// these constants are either used by out bootstrap wrapper script
+		// (AGAVI_TESTING_ORIGINAL_PHPUNIT_BOOTSTRAP) or can be used by the user's
 		// bootstrap script (AGAVI_TESTING_IN_SEPERATE_PROCESS)
 		$constants = sprintf('
 			define("AGAVI_TESTING_IN_SEPERATE_PROCESS", true);
@@ -330,8 +331,8 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 			',
 			var_export(isset($GLOBALS["__PHPUNIT_BOOTSTRAP"]) ? $GLOBALS["__PHPUNIT_BOOTSTRAP"] : null, true)
 		);
-		
-		
+
+
 		$isolatedTestSettings = array(
 			'environment' => $this->getIsolationEnvironment(),
 			'defaultContext' => $this->getIsolationDefaultContext(),
@@ -366,15 +367,15 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 				'constants' => $oldVars['constants'] . PHP_EOL . $constants,
 				'globals' => $oldVars['globals'] . PHP_EOL . $globals,
 			));
-			
+
 		}
 	}
-	
+
 	/**
 	 * Whether or not an agavi bootstrap should be done in isolation.
-	 * 
+	 *
 	 * @return       boolean true if agavi should be bootstrapped
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 *
 	 * @since        1.0.2
@@ -382,7 +383,7 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 	protected function doBootstrap()
 	{
 		$flag = true;
-			
+
 		$annotations = $this->getAnnotations();
 		if(!empty($annotations['method']['agaviBootstrap'])) {
 			$flag = AgaviToolkit::literalize($annotations['method']['agaviBootstrap'][0]);
@@ -391,5 +392,5 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 		}
 		return $flag;
 	}
-	
+
 }

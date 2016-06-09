@@ -46,7 +46,7 @@ final class AgaviToolkit
 		if(strpos($path, "file://") === 0) {
 			$path = substr($path, 7);
 		}
-		
+
 		if($path[0] == '/' || substr($path, 0, 2) == '\\\\' ||
 			(
 				strlen($path) >= 3 && ctype_alpha($path[0]) &&
@@ -145,7 +145,7 @@ final class AgaviToolkit
 		if(!AgaviConfig::get('core.cache_dir')) {
 			throw new AgaviException('Holy disk wipe, Batman! It seems that the value of "core.cache_dir" is empty, and because Agavi considers you its most dearest of friends, it chose not to erase your entire file system. Skynet or other evil machines may not be so forgiving however, so please fix whatever code you wrote that caused this :)');
 		}
-		
+
 		$ignores = array('.', '..', '.svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.gitignore', '.gitkeep');
 		$path = str_replace('/', DIRECTORY_SEPARATOR, str_replace('\\', DIRECTORY_SEPARATOR, $path));
 		$path = realpath(AgaviConfig::get('core.cache_dir') . DIRECTORY_SEPARATOR . $path);
@@ -265,7 +265,7 @@ final class AgaviToolkit
 		}
 		return str_replace($search, $arguments, $string);
 	}
-	
+
 	/**
 	 * Literalize a string value.
 	 *
@@ -283,16 +283,16 @@ final class AgaviToolkit
 		if(!is_string($value)) {
 			return $value;
 		}
-		
+
 		// trim!
 		$value = trim($value);
 		if($value == '') {
 			return null;
 		}
-		
+
 		// lowercase our value for comparison
 		$lvalue = strtolower($value);
-		
+
 		if($lvalue == 'on' || $lvalue == 'yes' || $lvalue == 'true') {
 			// replace values 'on' and 'yes' with a boolean true value
 			return true;
@@ -302,11 +302,11 @@ final class AgaviToolkit
 		} elseif(!is_numeric($value)) {
 			return self::expandDirectives($value);
 		}
-		
+
 		// numeric value, remains a string on purpose (for BC)
 		return $value;
 	}
-	
+
 	/**
 	 * Replace configuration directive identifiers in a string.
 	 *
@@ -322,15 +322,30 @@ final class AgaviToolkit
 		do {
 			$oldvalue = $value;
 			$value = preg_replace_callback(
-				'/\%([\w\.]+?)\%/',
-				function($matches) { return AgaviConfig::get($matches[1], '%' . $matches[1] . '%'); },
+				'/\%([\w\.\-]+?)\%/',
+				array('AgaviToolkit', 'expandDirectivesCallback'),
 				$value
 			);
 		} while($oldvalue != $value);
-		
+
 		return $value;
 	}
-	
+
+	/**
+	 * preg_replace_callback used in AgaviTookit::expandDirectives()
+	 *
+	 * @param      array An array of matches; index 1 is used.
+	 *
+	 * @return     string A value to use for replacement.
+	 *
+	 * @author     David Zülke <dz@bitxtender.com>
+	 * @since      0.11.0
+	 */
+	private static function expandDirectivesCallback($matches)
+	{
+		return AgaviConfig::get($matches[1], '%' . $matches[1] . '%');
+	}
+
 	/**
 	 * This function takes the numerator and divides it through the denominator while
 	 * storing the remainder and returning the quotient.
@@ -354,7 +369,7 @@ final class AgaviToolkit
 
 		return $quotient;
 	}
-	
+
 	/**
 	 * Determines whether a port declaration is necessary in a URL authority.
 	 *
@@ -383,7 +398,7 @@ final class AgaviToolkit
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Tries to grab a value from the given array using the given list of keys.
 	 *
@@ -420,7 +435,7 @@ final class AgaviToolkit
 	{
 		return !is_array($value);
 	}
-	
+
 	/**
 	 * Generate a proper unique ID.
 	 *
@@ -437,7 +452,7 @@ final class AgaviToolkit
 	{
 		return uniqid($prefix, true);
 	}
-	
+
 	/**
 	 * Returns the canonical name for a dot-separated view/action/model name.
 	 * This method is idempotent.
@@ -445,7 +460,7 @@ final class AgaviToolkit
 	 * @param      string The view/action/model name.
 	 *
 	 * @return     string The canonical name.
-	 * 
+	 *
 	 * @author     Felix Gilcher <felix.gilcher@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -453,7 +468,7 @@ final class AgaviToolkit
 	{
 		return str_replace('.', '/', $name);
 	}
-	
+
 	/**
 	 * Evaluates a given AgaviConfig per-module directive using the given info.
 	 *
@@ -468,6 +483,14 @@ final class AgaviToolkit
 	 */
 	public static function evaluateModuleDirective($moduleName, $directiveNameFragment, $variables = array())
 	{
+	    /*
+	     * Simple patch to create a new variable named shortActionName to make them available in expandVariables
+	     */
+	    if (isset($variables['actionName']))
+	    {
+            $variables['shortActionName'] = self::extractShortActionName($variables['actionName']);
+	    }
+
 		return AgaviToolkit::expandVariables(
 			AgaviToolkit::expandDirectives(
 				AgaviConfig::get(
@@ -480,15 +503,14 @@ final class AgaviToolkit
 			),
 			$variables
 		);
-		
 	}
-	
+
 	/**
 	 * Counterpart of PHP's parse_url().
-	 * 
+	 *
 	 * @param      array $parts The parts of the URL as defined by parse_url()
 	 * @return     string
-	 * 
+	 *
 	 * @author     Thomas Bachem <mail@thomasbachem.com>
 	 */
 	public static function buildUrl(array $parts)
@@ -523,6 +545,28 @@ final class AgaviToolkit
 		}
 		return $url;
 	}
+
+	/*
+     * Extracts the "shortActionName" from given action name . e.g.:
+     *
+     * Foo/Bar -> Bar is now the shortActionName
+     *
+     * @param      string The name of the action
+     *
+     * @return     string The final value
+     *
+     * @author     Jan.Schütze <jan.schuetze@exozet.com>
+     * @since      1.0.2
+     */
+    public static function extractShortActionName($longActionName)
+    {
+        $pos = strrpos($longActionName,'/');
+        if ($pos !== false) {
+            return substr($longActionName, $pos + 1);
+        }
+
+        return $longActionName;
+    }
 }
 
 ?>

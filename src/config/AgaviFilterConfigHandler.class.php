@@ -31,8 +31,8 @@
  */
 class AgaviFilterConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/filters/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/filters/1.0';
+
 	/**
 	 * Execute this configuration handler.
 	 *
@@ -51,31 +51,31 @@ class AgaviFilterConfigHandler extends AgaviXmlConfigHandler
 	{
 		// set up our default namespace
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'filters');
-		
+
 		$config = $document->documentURI;
-		
+
 		$filters = array();
-		
+
 		foreach($document->getConfigurationElements() as $cfg) {
 			if($cfg->has('filters')) {
 				foreach($cfg->get('filters') as $filter) {
 					$name = $filter->getAttribute('name', AgaviToolkit::uniqid());
-					
+
 					if(!isset($filters[$name])) {
 						$filters[$name] = array('params' => array(), 'enabled' => AgaviToolkit::literalize($filter->getAttribute('enabled', true)));
 					} else {
 						$filters[$name]['enabled'] = AgaviToolkit::literalize($filter->getAttribute('enabled', $filters[$name]['enabled']));
 					}
-					
+
 					if($filter->hasAttribute('class')) {
 						$filters[$name]['class'] = $filter->getAttribute('class');
 					}
-					
+
 					$filters[$name]['params'] = $filter->getAgaviParameters($filters[$name]['params']);
 				}
 			}
 		}
-		
+
 		$data = array();
 
 		foreach($filters as $name => $filter) {

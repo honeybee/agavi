@@ -214,7 +214,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 				$m = new $mc($lmsg, $severity);
 				$lm->log($m, $cfg['logging_logger']);
 			}
-			
+
 			// should we throw an exception, or carry on?
 			if($maxError > $cfg['ignore_parse_errors']) {
 				throw new AgaviParseException($emsg);
@@ -301,6 +301,18 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 		// an array of all validation incidents; errors inserted for fields or multiple fields will be removed in here
 		$allIncidents = $vr->getIncidents();
 
+		$skipXpaths = $this->getParameter('skip_xpaths', []);
+		$skipNodes = [];
+		if (is_array($skipXpaths) && count($skipXpaths) > 0) {
+			foreach ($skipXpaths as $skipXpath) {
+				foreach ($this->xpath->query($skipXpath) as $skipNode) {
+					if (!in_array($skipNode, $skipNodes, true)) {
+						$skipNodes[] = $skipNode;
+					}
+				}
+			}
+		}
+
 		foreach($forms as $form) {
 			if($form->tagName == 'form') {
 				if($populate instanceof AgaviParameterHolder) {
@@ -354,7 +366,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 				descendant::%1$sinput[@name and (not(@type="checkbox") or (not(contains(@name, "[]")) or (contains(@name, "[]") and @value)))]',
 				$this->xmlnsPrefix
 			);
-			
+
 			if(($formId = $form->hasAttribute('id')) != "") {
 				// find elements associated with this form as well
 				$query .= sprintf(' |
@@ -366,7 +378,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 					$formId
 				);
 			}
-			
+
 			foreach($this->xpath->query($query, $form) as $element) {
 
 				$pname = $name = $element->getAttribute('name');
@@ -419,7 +431,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 					$pname = $this->fromUtf8($pname, $encoding);
 				}
 
-				if($skip !== null && preg_match($skip, $pname . ($checkValue ? '[]' : ''))) {
+				if($skip !== null && preg_match($skip, $pname . ($checkValue ? '[]' : '')) || in_array($element, $skipNodes, true)) {
 					// skip field
 					continue;
 				}
@@ -430,7 +442,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 						? AgaviWebRequestDataHolder::SOURCE_FILES
 						: AgaviRequestDataHolder::SOURCE_PARAMETERS
 				);
-				
+
 				// there's an error with the element's name in the request? good. let's give the baby a class!
 				if($vr->getAuthoritativeArgumentSeverity($argument) > AgaviValidator::SILENT) {
 					// a collection of all elements that need an error class
@@ -460,7 +472,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 								foreach($errorClassResults as $errorClassDestinationElement) {
 									$errorClassDestinationElement->setAttribute('class', preg_replace('/\s*$/', ' ' . $errorClassName, $errorClassDestinationElement->getAttribute('class')));
 								}
-								
+
 								// and break the foreach, our expression matched after all - no need to look further
 								break;
 							}
@@ -544,14 +556,12 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 						}
 
 					} elseif($inputType != 'button' && $inputType != 'submit') {
-						
+
 						// everything else
-						
 						// unless "include_hidden_inputs" is false and it's a hidden input...
 						if($cfg['include_hidden_inputs'] || $inputType != 'hidden') {
 							// remove original value
 							$element->removeAttribute('value');
-							
 							// and set a new one if it's there and unless it's a password field (or we actually want to refill those)
 							if($p->hasParameter($pname) && ($cfg['include_password_inputs'] || $inputType != 'password')) {
 								$element->setAttribute('value', $value);
@@ -632,7 +642,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 						$reset[] = $attributeCopy;
 					}
 				}
-				
+
 				foreach($remove as $attribute) {
 					$this->doc->documentElement->removeAttributeNode($attribute);
 				}
@@ -677,7 +687,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 					$firstError = preg_last_error();
 				}
 			}
-			
+
 			if($firstError) {
 				$error = "Form Population Filter encountered an error while performing final regular expression replaces on the output.\n";
 				// the preg_replaces failed and produced an empty string. let's find out why
@@ -733,7 +743,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 				}
 			}
 		}
-		
+
 		if(!$errors) {
 			// nothing to do here
 			return true;
@@ -768,13 +778,13 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 			} else {
 				$errorContainer = null;
 			}
-			
+
 			if(!$errorMarkup && !$errorContainer) {
 				throw new AgaviException('Form Population Filter was unable to insert error messages into the document using the XPath expression "' . $xpathExpression . '" because the element information did not contain either a "markup" or "container" entry to use.');
 			}
-			
+
 			$errorElements = array();
-			
+
 			if($errorMarkup) {
 				foreach($errors as $error) {
 					if(is_callable($errorMarkup)) {
@@ -807,7 +817,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 					} else {
 						throw new AgaviException('Form Population Filter was unable to insert an error message into the document using the XPath expression "' . $xpathExpression . '" because the element information could not be evaluated as an XML/HTML fragment or as a PHP callback.');
 					}
-					
+
 					$errorElements[] = $errorElement;
 				}
 			}
@@ -887,7 +897,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 					// in case the target yielded more than one location, we need to clone the element
 					// because the document fragment node will be corrupted after an insert
 					$clonedErrorElement = $errorElement->cloneNode(true);
-					
+
 					if($errorLocation == 'before') {
 						$target->parentNode->insertBefore($clonedErrorElement, $target);
 					} elseif($errorLocation == 'after') {
@@ -1050,7 +1060,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 		if($ot = $this->getParameter('output_types')) {
 			$this->setParameter('output_types', (array) $ot);
 		}
-		
+
 		$savexmlOptions = 0;
 		foreach((array)$this->getParameter('savexml_options', array()) as $option) {
 			if(is_numeric($option)) {
@@ -1071,7 +1081,16 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 		} elseif($ignoreParseErrors === false) {
 			$ignoreParseErrors = LIBXML_ERR_NONE;
 		}
-		
+
+		$logParseErrors =& $this->getParameter('log_parse_errors');
+		if(is_string($logParseErrors) && defined($logParseErrors)) {
+			$logParseErrors = constant($logParseErrors);
+		}
+		// BC
+		if($logParseErrors === true) {
+			$logParseErrors = LIBXML_ERR_WARNING;
+		}
+
 		$logParseErrors =& $this->getParameter('log_parse_errors');
 		if(is_string($logParseErrors) && defined($logParseErrors)) {
 			$logParseErrors = constant($logParseErrors);

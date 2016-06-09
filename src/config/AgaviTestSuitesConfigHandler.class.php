@@ -15,7 +15,7 @@
 // +---------------------------------------------------------------------------+
 
 /**
- * AgaviTestSuitesConfigHandler reads the testsuites configuration files to determine 
+ * AgaviTestSuitesConfigHandler reads the testsuites configuration files to determine
  * the available suites and their tests.
  *
  * @package    agavi
@@ -31,8 +31,8 @@
  */
 class AgaviTestSuitesConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/testing/suites/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/testing/suites/1.0';
+
 	/**
 	 * Execute this configuration handler.
 	 *
@@ -50,39 +50,39 @@ class AgaviTestSuitesConfigHandler extends AgaviXmlConfigHandler
 	{
 		// set up our default namespace
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'suite');
-		
+
 		// remember the config file path
 		$config = $document->documentURI;
-		
+
 		$data = array();
 		// loop over <configuration> elements
 		foreach($document->getConfigurationElements() as $configuration) {
-			foreach($configuration->get('suites') as $current) {
+			foreach($configuration->getElementsByTagName('suite') as $current) {
 				$includes = array();
-				foreach($current->get('includes') as $include) {
+				foreach($current->getElementsByTagName('include') as $include) {
 					$includes[] = $include->textContent;
 				}
-				
 				$excludes = array();
-				foreach($current->get('excludes') as $exclude) {
+				foreach($current->getElementsByTagName('exclude') as $exclude) {
 					$excludes[] = $exclude->textContent;
 				}
-				
+
 				$suite =  array(
 					'class' => $current->getAttribute('class', 'AgaviTestSuite'),
-					'base' => $current->getAttribute('base', 'tests/'),
+					'base' => $current->getAttribute('base', './'),
 					'includes' => $includes,
 					'excludes' => $excludes
 				);
-				
+
 				$suite['testfiles'] = array();
 				foreach($current->get('testfiles') as $file) {
 					$suite['testfiles'][] = $file->textContent;
 				}
-				
+
 				$data[$current->getAttribute('name')] = $suite;
 			}
 		}
+
 		$code = 'return '.var_export($data, true);
 		return $this->generate($code, $config);
 	}

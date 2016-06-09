@@ -31,8 +31,8 @@
  */
 class AgaviModuleConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/module/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/module/1.0';
+
 	/**
 	 * Execute this configuration handler.
 	 *
@@ -50,35 +50,35 @@ class AgaviModuleConfigHandler extends AgaviXmlConfigHandler
 	{
 		// set up our default namespace
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'module');
-		
+
 		// remember the config file path
 		$config = $document->documentURI;
-		
+
 		$enabled = false;
 		$prefix = 'modules.${moduleName}.';
 		$data = array();
-		
+
 		// loop over <configuration> elements
 		foreach($document->getConfigurationElements() as $configuration) {
 			$module = $configuration->getChild('module');
 			if(!$module) {
 				continue;
 			}
-			
+
 			// enabled flag is treated separately
 			$enabled = (bool) AgaviToolkit::literalize($module->getAttribute('enabled'));
-			
+
 			// loop over <setting> elements; there can be many of them
 			foreach($module->get('settings') as $setting) {
 				$localPrefix = $prefix;
-				
+
 				// let's see if this buddy has a <settings> parent with valuable information
 				if($setting->parentNode->localName == 'settings') {
 					if($setting->parentNode->hasAttribute('prefix')) {
 						$localPrefix = $setting->parentNode->getAttribute('prefix');
 					}
 				}
-				
+
 				$settingName = $localPrefix . $setting->getAttribute('name');
 				if($setting->hasAgaviParameters()) {
 					$data[$settingName] = $setting->getAgaviParameters();
@@ -87,7 +87,7 @@ class AgaviModuleConfigHandler extends AgaviXmlConfigHandler
 				}
 			}
 		}
-		
+
 		$code = array();
 		$code[] = '$lcModuleName = strtolower($moduleName);';
 		$code[] = 'AgaviConfig::set(AgaviToolkit::expandVariables(' . var_export($prefix . 'enabled', true) . ', array(\'moduleName\' => $lcModuleName)), ' . var_export($enabled, true) . ', true, true);';
@@ -98,7 +98,7 @@ class AgaviModuleConfigHandler extends AgaviXmlConfigHandler
 			$code[] = '$moduleConfig = array_combine($moduleConfigKeys, $moduleConfig);';
 			$code[] = 'AgaviConfig::fromArray($moduleConfig);';
 		}
-		
+
 		return $this->generate($code, $config);
 	}
 }

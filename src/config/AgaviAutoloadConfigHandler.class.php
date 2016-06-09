@@ -33,8 +33,8 @@
  */
 class AgaviAutoloadConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/autoload/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/autoload/1.0';
+
 	/**
 	 * Execute this configuration handler.
 	 *
@@ -57,17 +57,17 @@ class AgaviAutoloadConfigHandler extends AgaviXmlConfigHandler
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'autoload');
 
 		$classes = $namespaces = array();
-		
+
 		foreach($document->getConfigurationElements() as $configuration) {
 			if(!$configuration->has('autoloads')) {
 				continue;
 			}
-			
+
 			// let's do our fancy work
 			foreach($configuration->get('autoloads') as $autoload) {
 				// we can have variables in the filename
 				$path = AgaviToolkit::expandDirectives($autoload->getValue());
-				
+
 				// sanity check; XML Schema can't do <xs:choice> on attributes...
 				if(($isClass = $autoload->hasAttribute('class')) && $autoload->hasAttribute('namespace')) {
 					$error = sprintf(
@@ -77,10 +77,10 @@ class AgaviAutoloadConfigHandler extends AgaviXmlConfigHandler
 					);
 					throw new AgaviParseException($error);
 				}
-				
+
 				// prepend the app dir if the path is not absolute
 				$file = self::replacePath($path);
-				
+
 				// check if absolute path is readable or try to resolve it against the include path
 				if(!file_exists($file) && ($path == $file || !($file = stream_resolve_include_path($path)))) {
 					// the class path doesn't exist and couldn't be resolved against the include path either
@@ -93,14 +93,14 @@ class AgaviAutoloadConfigHandler extends AgaviXmlConfigHandler
 					);
 					throw new AgaviParseException($error);
 				}
-				
+
 				if($isClass) {
 					// it's a class
 					$classes[$autoload->getAttribute('class')] = $file;
 				} else {
 					// it's a whole namespace
 					// trim backslashes from the namespace and trailing slashes or backslashes from the path
-					$namespaces[trim($autoload->getAttribute('namespace'), '\\')] = rtrim($file, '/\\'); 
+					$namespaces[trim($autoload->getAttribute('namespace'), '\\')] = rtrim($file, '/\\');
 				}
 			}
 		}

@@ -1,5 +1,5 @@
 {
-	"name": "agavi/agavi",
+	"name": "honeybee/agavi",
 	"description": "Agavi is a full-featured MVC-style framework for PHP5 with a strong focus on structure, code reusability and flexibility.",
 	"keywords": ["framework", "mvc"],
 	"homepage": "http://agavi.org",
@@ -26,7 +26,7 @@
 		"phing/phing": "~2.6.1"
 	},
 	"require-dev": {
-		"phpunit/phpunit": ">=3.7 <=4.8.10",
+		"phpunit/phpunit": "^5.0.5",
 		"ext-xdebug": ">=2.1"
 	},
 	"suggest": {

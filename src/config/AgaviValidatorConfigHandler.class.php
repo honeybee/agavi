@@ -31,8 +31,8 @@
  */
 class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/validators/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/validators/1.0';
+
 	/**
 	 * @var        array operator => validator mapping
 	 */
@@ -59,11 +59,11 @@ class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 	public function execute(AgaviXmlConfigDomDocument $document)
 	{
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'validators');
-		
+
 		$config = $document->documentURI;
-		
+
 		$code = array();//array('lines' => array(), 'order' => array());
-		
+
 		foreach($document->getConfigurationElements() as $cfg) {
 			if($cfg->has('validator_definitions')) {
 				foreach($cfg->get('validator_definitions') as $def) {
@@ -76,7 +76,7 @@ class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 					$this->classMap[$name]['errors'] = $this->getAgaviErrors($def, $this->classMap[$name]['errors']);
 				}
 			}
-			
+
 			$code = $this->processValidatorElements($cfg, $code, 'validationManager');
 		}
 
@@ -128,15 +128,15 @@ class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 		} else {
 			$class = $this->classMap[$validator->getAttribute('class')]['class'];
 		}
-		
+
 		// setting up parameters
 		$parameters = array(
 			'severity' => $validator->getAttribute('severity', $stdSeverity),
 			'required' => $stdRequired,
 		);
-		
+
 		$arguments = array();
-		
+
 		$stdMethod = $validator->getAttribute('method', $stdMethod);
 		$stdSeverity = $parameters['severity'];
 		if($validator->hasAttribute('name')) {
@@ -145,7 +145,7 @@ class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 			$name = AgaviToolkit::uniqid();
 			$validator->setAttribute('name', $name);
 		}
-		
+
 		$parameters = array_merge($this->classMap[$validator->getAttribute('class')]['parameters'], $parameters);
 		$parameters = array_merge($parameters, $validator->getAttributes());
 		$parameters = $validator->getAgaviParameters($parameters);
@@ -155,7 +155,7 @@ class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 			// empty translation domains are forbidden, treat as if translation_domain was not set
 			unset($parameters['translation_domain']);
 		}
-		
+
 		foreach($validator->get('arguments') as $argument) {
 			if($argument->hasAttribute('name')) {
 				$arguments[$argument->getAttribute('name')] = $argument->getValue();
@@ -163,10 +163,10 @@ class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 				$arguments[] = $argument->getValue();
 			}
 		}
-		
+
 		if($validator->hasChild('arguments')) {
 			$parameters['base'] = $validator->getChild('arguments')->getAttribute('base');
-			
+
 			if(!$arguments) {
 				// no arguments defined, but there is an <arguments /> element, so we're validating an array there
 				// lets add an empty fake argument for validation to work
@@ -174,18 +174,18 @@ class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 				$arguments[] = '';
 			}
 		}
-		
+
 		$errors = $this->getAgaviErrors($validator, $this->classMap[$validator->getAttribute('class')]['errors']);
-		
+
 		if($validator->hasAttribute('required')) {
 			$stdRequired = $parameters['required'] = AgaviToolkit::literalize($validator->getAttribute('required'));
 		}
-		
+
 		$methods = array('');
 		if(trim($stdMethod)) {
 			$methods = preg_split('/[\s]+/', $stdMethod);
 		}
-		
+
 		foreach($methods as $method) {
 			$code[$method][$name] = implode("\n", array(
 				sprintf(
@@ -207,13 +207,13 @@ class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 				),
 			));
 		}
-		
+
 		// more <validator> or <validators> children
 		$code = $this->processValidatorElements($validator, $code, '_validator_' . $name, $stdSeverity, $stdMethod, $stdRequired, isset($parameters['translation_domain']) ? $parameters['translation_domain'] : null);
-		
+
 		return $code;
 	}
-	
+
 	/**
 	 * Grabs generated code from the given element.
 	 *
@@ -251,14 +251,14 @@ class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 				$translationDomain = $defaultTranslationDomain;
 			}
 			$required = $defaultRequired;
-			
+
 			// append the code to generate
 			$code = $this->getValidatorArray($validator, $code, $name, $severity, $method, $required, $translationDomain);
 		}
-		
+
 		return $code;
 	}
-	
+
 	/**
 	 * Retrieve all of the Agavi error elements associated with this
 	 * element.
@@ -276,18 +276,18 @@ class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 	public function getAgaviErrors(AgaviXmlConfigDomElement $node, array $existing = array())
 	{
 		$result = $existing;
-		
+
 		$elements = $node->get('errors', self::XML_NAMESPACE);
-		
+
 		foreach($elements as $element) {
 			$key = '';
 			if($element->hasAttribute('for')) {
 				$key = $element->getAttribute('for');
 			}
-			
+
 			$result[$key] = $element->getValue();
 		}
-		
+
 		return $result;
 	}
 }

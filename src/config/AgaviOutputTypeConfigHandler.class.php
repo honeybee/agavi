@@ -29,8 +29,8 @@
  */
 class AgaviOutputTypeConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/output_types/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/output_types/1.0';
+
 	/**
 	 * Execute this configuration handler.
 	 *
@@ -51,17 +51,17 @@ class AgaviOutputTypeConfigHandler extends AgaviXmlConfigHandler
 	{
 		// set up our default namespace
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'output_types');
-		
+
 		// remember the config file path
 		$config = $document->documentURI;
-		
+
 		$data = array();
 		$defaultOt = null;
 		foreach($document->getConfigurationElements() as $cfg) {
 			if(!$cfg->has('output_types')) {
 				continue;
 			}
-			
+
 			$otnames = array();
 			foreach($cfg->get('output_types') as $outputType) {
 				$otname = $outputType->getAttribute('name');
@@ -92,11 +92,11 @@ class AgaviOutputTypeConfigHandler extends AgaviXmlConfigHandler
 				if($outputType->has('layouts')) {
 					foreach($outputType->get('layouts') as $layout) {
 						$layers = array();
-						
+
 						if($layout->has('layers')) {
 							foreach($layout->get('layers') as $layer) {
 								$slots = array();
-								
+
 								if($layer->has('slots')) {
 									foreach($layer->get('slots') as $slot) {
 										$slots[$slot->getAttribute('name')] = array(
@@ -108,7 +108,7 @@ class AgaviOutputTypeConfigHandler extends AgaviXmlConfigHandler
 										);
 									}
 								}
-								
+
 								$layers[$layer->getAttribute('name')] = array(
 									'class' => $layer->getAttribute('class', $this->getParameter('default_layer_class', 'AgaviFileTemplateLayer')),
 									'parameters' => $layer->getAgaviParameters(array()),
@@ -117,7 +117,7 @@ class AgaviOutputTypeConfigHandler extends AgaviXmlConfigHandler
 								);
 							}
 						}
-						
+
 						$data[$outputTypeName]['layouts'][$layout->getAttribute('name')] = array(
 							'layers' => $layers,
 							'parameters' => $layout->getAgaviParameters(array()),
@@ -141,7 +141,7 @@ class AgaviOutputTypeConfigHandler extends AgaviXmlConfigHandler
 			$error = sprintf($error, $document->documentURI, $defaultOt);
 			throw new AgaviConfigurationException($error);
 		}
-		
+
 		$code = array();
 		foreach($data as $outputTypeName => $outputType) {
 			$code[] = '$ot = new AgaviOutputType();';
@@ -158,7 +158,7 @@ class AgaviOutputTypeConfigHandler extends AgaviXmlConfigHandler
 			$code[] = sprintf('$this->outputTypes[%s] = $ot;', var_export($outputTypeName, true));
 		}
 		$code[] = sprintf('$this->defaultOutputType = %s;', var_export($defaultOt, true));
-		
+
 		return $this->generate($code, $config);
 	}
 }

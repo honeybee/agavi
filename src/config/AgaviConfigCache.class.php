@@ -50,7 +50,7 @@ class AgaviConfigCache
 	 *                  needs processing.
 	 */
 	protected static $handlersDirty = true;
-	
+
 	/**
 	 * @var        bool Whether the config handler files have been required.
 	 */
@@ -78,7 +78,7 @@ class AgaviConfigCache
 	protected static function callHandler($name, $config, $cache, $context, array $handlerInfo = null)
 	{
 		self::setupHandlers();
-		
+
 		if(null === $handlerInfo) {
 			// we need to load the handlers first
 			$handlerInfo = self::getHandlerInfo($name);
@@ -90,24 +90,24 @@ class AgaviConfigCache
 			$error = sprintf($error, $name);
 			throw new AgaviConfigurationException($error);
 		}
-		
+
 		$data = self::executeHandler($config, $context, $handlerInfo);
 		self::writeCacheFile($config, $cache, $data, false);
 	}
 
 	/**
 	 * Set up all config handler definitions.
-	 * 
+	 *
 	 * Checks whether the handlers have been loaded or the dirtyHandlers flat is
 	 * set, and loads any handler that has not been loaded.
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 * @since        1.0.0
 	 */
 	protected static function setupHandlers()
 	{
 		self::loadConfigHandlers();
-		
+
 		if(self::$handlersDirty) {
 			// set handlersdirty to false, prevent an infinite loop
 			self::$handlersDirty = false;
@@ -120,14 +120,14 @@ class AgaviConfigCache
 			}
 		}
 	}
-	
+
 	/**
 	 * Fetch the handler information for the given filename.
-	 * 
+	 *
 	 * @param        string The name of the config file (partial path).
-	 * 
+	 *
 	 * @return       array  The handler info.
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 * @since        1.0.0
 	 */
@@ -157,19 +157,19 @@ class AgaviConfigCache
 				}
 			}
 		}
-		
+
 		return $handlerInfo;
 	}
-	
+
 	/**
 	 * Execute the config handler for the given file.
-	 * 
+	 *
 	 * @param        string The path to the config file (full path).
 	 * @param        string The context which we're currently running.
 	 * @param        array  The config handler info.
-	 * 
+	 *
 	 * @return       string The compiled data.
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 * @since        1.0.0
 	 */
@@ -201,10 +201,10 @@ class AgaviConfigCache
 			$handler->initialize($validationFile, null, $handlerInfo['parameters']);
 			$data = $handler->execute($config, $context);
 		}
-		
+
 		return $data;
 	}
-	
+
 	/**
 	 * Check to see if a configuration file has been modified and if so
 	 * recompile the cache file associated with it.
@@ -298,12 +298,12 @@ class AgaviConfigCache
 		$cacheName = sprintf(
 			'%1$s_%2$s.php',
 			preg_replace(
-				'/[^\w-_.]/i', 
-				'_', 
+				'/[^\w-_.]/i',
+				'_',
 				sprintf(
-					'%1$s_%2$s_%3$s', 
-					basename($config), 
-					$environment, 
+					'%1$s_%2$s_%3$s',
+					basename($config),
+					$environment,
 					$context
 				)
 			),
@@ -316,7 +316,7 @@ class AgaviConfigCache
 				)
 			)
 		);
-		
+
 		return AgaviConfig::get('core.cache_dir') . DIRECTORY_SEPARATOR . self::CACHE_SUBDIR . DIRECTORY_SEPARATOR . $cacheName;
 	}
 
@@ -361,14 +361,14 @@ class AgaviConfigCache
 		} else {
 			self::$handlers = array();
 		}
-		
+
 		// some checks first
 		if(!defined('LIBXML_DOTTED_VERSION') || (!AgaviConfig::get('core.ignore_broken_libxml', false) && !version_compare(LIBXML_DOTTED_VERSION, '2.6.16', 'gt'))) {
 			throw new AgaviException("A libxml version greater than 2.6.16 is highly recommended. With version 2.6.16 and possibly later releases, validation of XML configuration files will not work and Form Population Filter will eventually fail randomly on some documents due to *severe bugs* in older libxml releases (2.6.16 was released in November 2004, so it is really getting time to update).\n\nIf you still would like to try your luck, disable this message by doing\nAgaviConfig::set('core.ignore_broken_libxml', true);\nand\nAgaviConfig::set('core.skip_config_validation', true);\nbefore calling\nAgavi::bootstrap();\nin index.php (app/config.php is not the right place for this).\n\nBut be advised that you *will* run into segfaults and other sad situations eventually, so what you should really do is upgrade your libxml install.");
 		}
-		
+
 		$agaviDir = AgaviConfig::get('core.agavi_dir');
-		
+
 		// :NOTE: fgilcher, 2008-12-03
 		// we need this method reentry safe for unit testing
 		// sorry for the testing code in the class, but I don't have
@@ -411,7 +411,7 @@ class AgaviConfigCache
 			}
 			self::$filesIncluded = true;
 		}
-		
+
 		// manually create our config_handlers.xml handler
 		self::$handlers['config_handlers.xml'] = array(
 			'class' => 'AgaviConfigHandlersConfigHandler',
@@ -420,8 +420,6 @@ class AgaviConfigCache
 			'transformations' => array(
 				AgaviXmlConfigParser::STAGE_SINGLE => array(
 					// 0.11 -> 1.0
-					$agaviDir . '/config/xsl/config_handlers.xsl',
-					// 1.0 -> 1.0 with AgaviReturnArrayConfigHandler <transformation> for Agavi 1.1
 					$agaviDir . '/config/xsl/config_handlers.xsl',
 				),
 				AgaviXmlConfigParser::STAGE_COMPILATION => array(
@@ -454,13 +452,13 @@ class AgaviConfigCache
 		// application configuration handlers
 		self::loadConfigHandlersFile($cfg);
 	}
-	
+
 	/**
 	 * Load the config handlers from the given config file.
 	 * Existing handlers will not be overwritten.
-	 * 
+	 *
 	 * @param      string The path to a config_handlers.xml file.
-	 * 
+	 *
 	 * @author     Felix Gilcher <felix.gilcher@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -471,9 +469,9 @@ class AgaviConfigCache
 
 	/**
 	 * Schedules a config handlers file to be loaded.
-	 * 
+	 *
 	 * @param      string The path to a config_handlers.xml file.
-	 * 
+	 *
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
@@ -483,7 +481,7 @@ class AgaviConfigCache
 			if(!is_readable($filename)) {
 				throw new AgaviUnreadableException('Configuration file "' . $filename . '" does not exist or is unreadable.');
 			}
-			
+
 			self::$handlerFiles[$filename] = false;
 			self::$handlersDirty = true;
 		}
@@ -528,7 +526,7 @@ class AgaviConfigCache
 				return;
 			}
 		}
-		
+
 		// still here?
 		// that means we could not write the cache file
 		$error = 'Failed to write cache file "%s" generated from ' . 'configuration file "%s".';

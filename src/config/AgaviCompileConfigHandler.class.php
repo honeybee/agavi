@@ -32,8 +32,8 @@
  */
 class AgaviCompileConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/compile/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/compile/1.0';
+
 	/**
 	 * Execute this configuration handler.
 	 *
@@ -53,31 +53,31 @@ class AgaviCompileConfigHandler extends AgaviXmlConfigHandler
 	{
 		// set up our default namespace
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'compile');
-		
+
 		$config = $document->documentURI;
-		
+
 		$data = array();
-		
+
 		// let's do our fancy work
 		foreach($document->getConfigurationElements() as $configuration) {
 			if(!$configuration->has('compiles')) {
 				continue;
 			}
-			
+
 			foreach($configuration->get('compiles') as $compileFile) {
 				$file = trim($compileFile->getValue());
-				
+
 				$file = AgaviToolkit::expandDirectives($file);
 				$file = self::replacePath($file);
 				$file = realpath($file);
-				
+
 				if(!is_readable($file)) {
 					// file doesn't exist
 					$error = 'Configuration file "%s" specifies nonexistent ' . 'or unreadable file "%s"';
 					$error = sprintf($error, $config, $compileFile->getValue());
 					throw new AgaviParseException($error);
 				}
-				
+
 				if(AgaviConfig::get('core.debug', false)) {
 					// debug mode, just require() the files, makes for nicer stack traces
 					$contents = 'require(' . var_export($file, true) . ');';
@@ -85,12 +85,12 @@ class AgaviCompileConfigHandler extends AgaviXmlConfigHandler
 					// no debug mode, so make things fast
 					$contents = $this->formatFile(file_get_contents($file));
 				}
-				
+
 				// append file data
 				$data[$file] = $contents;
 			}
 		}
-		
+
 		return $this->generate($data, $config);
 	}
 

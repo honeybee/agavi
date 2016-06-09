@@ -16,8 +16,8 @@
 /**
  * AgaviFlowTestCase is the base class for all flow tests and provides
  * the necessary assertions
- * 
- * 
+ *
+ *
  * @package    agavi
  * @subpackage testing
  *
@@ -34,17 +34,17 @@ abstract class AgaviFlowTestCase extends AgaviPhpUnitTestCase implements AgaviIF
 	 * @var        string the name of the context to use, null for default context
 	 */
 	protected $contextName = null;
-	
+
 	/**
 	 * @var        string the fake routing input
 	 */
 	protected $input;
-	
+
 	/**
 	 * @var        AgaviResponse the response after the dispatch call
 	 */
 	protected $response;
-	
+
 	/**
 	 * Constructs a test case with the given name.
 	 *
@@ -57,7 +57,7 @@ abstract class AgaviFlowTestCase extends AgaviPhpUnitTestCase implements AgaviIF
 		parent::__construct($name, $data, $dataName);
 		$this->setRunTestInSeparateProcess(true);
 	}
-	
+
 	/**
 	 * Return the context defined for this test (or the default one).
 	 *
@@ -70,28 +70,28 @@ abstract class AgaviFlowTestCase extends AgaviPhpUnitTestCase implements AgaviIF
 	{
 		return AgaviContext::getInstance($this->contextName);
 	}
-	
+
 	/**
 	 * dispatch the request
 	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
-	 * @since        1.0.0 
+	 * @since        1.0.0
 	 */
 	public function dispatch($parameters = array())
 	{
 		$_SERVER['REQUEST_URI'] = $this->getDispatchScriptName() . $this->getRoutingInput();
 		$_SERVER['SCRIPT_NAME'] = $this->getDispatchScriptName();
-		
+
 		$context = $this->getContext();
 		$this->setRequestData($parameters);
 		$context->getRequest()->setMethod($this->getRequestMethod());
-		
+
 		$controller = $context->getController();
 		$controller->setParameter('send_response', false);
-		
+
 		$this->response = $controller->dispatch();
 	}
-	
+
 	protected function setRequestData($data)
 	{
 		$rd = $this->getContext()->getRequest()->getRequestData();
@@ -101,21 +101,21 @@ abstract class AgaviFlowTestCase extends AgaviPhpUnitTestCase implements AgaviIF
 			$rd->merge($data);
 		}
 	}
-	
+
 	/**
 	 * retrieve the name of the dispatcher script
-	 * 
+	 *
 	 * @return       string the dispatcher scriptname set by an annotation, '/index.php' by default
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 * @since        1.0.1
 	 */
 	protected function getDispatchScriptName()
 	{
 		$scriptName = null;
-		
+
 		$annotations = $this->getAnnotations();
-		
+
 		if(!empty($annotations['method']['agaviDispatchScriptName'])) {
 			$scriptName = $annotations['method']['agaviDispatchScriptName'][0];
 		} elseif(!empty($annotations['class']['agaviDispatchScriptName'])) {
@@ -123,24 +123,24 @@ abstract class AgaviFlowTestCase extends AgaviPhpUnitTestCase implements AgaviIF
 		} else {
 			$scriptName = '/index.php';
 		}
-		
+
 		return $scriptName;
 	}
-	
+
 	/**
 	 * retrieve the request method for the dispatch call
-	 * 
+	 *
 	 * @return       string the name of the request method, 'Read' by default
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 * @since        1.0.1
 	 */
 	protected function getRequestMethod()
 	{
 		$method = null;
-		
+
 		$annotations = $this->getAnnotations();
-		
+
 		if(!empty($annotations['method']['agaviRequestMethod'])) {
 			$method = $annotations['method']['agaviRequestMethod'][0];
 		} elseif(!empty($annotations['class']['agaviRequestMethod'])) {
@@ -148,24 +148,24 @@ abstract class AgaviFlowTestCase extends AgaviPhpUnitTestCase implements AgaviIF
 		} else {
 			$method = 'Read';
 		}
-		
+
 		return $method;
 	}
-	
+
 	/**
 	 * retrieve the routing input for the dispatch call
-	 * 
+	 *
 	 * @return       string the name of the request method, 'Read' by default
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 * @since        1.0.1
 	 */
 	protected function getRoutingInput()
 	{
 		$input = null;
-		
+
 		$annotations = $this->getAnnotations();
-		
+
 		if(!empty($annotations['method']['agaviRoutingInput'])) {
 			$input = $annotations['method']['agaviRoutingInput'][0];
 		} elseif(!empty($annotations['class']['agaviRoutingInput'])) {
@@ -175,18 +175,18 @@ abstract class AgaviFlowTestCase extends AgaviPhpUnitTestCase implements AgaviIF
 		} else {
 			$input = '';
 		}
-		
+
 		return $input;
 	}
-	
+
 	/**
 	 * assert that the response has a given tag
-	 * 
+	 *
 	 * @see the documentation of PHPUnit's assertTag()
-	 * 
+	 *
 	 * @param        array the matcher describing the tag
 	 * @param        string an optional message
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 * @since        1.0.0
 	 */
@@ -194,13 +194,13 @@ abstract class AgaviFlowTestCase extends AgaviPhpUnitTestCase implements AgaviIF
 	{
 		$this->assertTag($matcher, $this->response->getContent(), $message, $isHtml);
 	}
-	
-	
+
+
 	/**
 	 * assert that the response does not have a given tag
-	 * 
+	 *
 	 * @see the documentation of PHPUnit's assertTag()
-	 * 
+	 *
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 * @since        1.0.0
 	 */

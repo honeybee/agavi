@@ -328,6 +328,7 @@ class AgaviWebRequest extends AgaviRequest
 			'GET' => 'read',
 			'POST' => 'write',
 			'PUT' => 'create',
+			'PATCH' => 'patch',
 			'DELETE' => 'remove',
 		), (array)$this->getParameter('method_names'));
 		$this->setParameter('method_names', $methods);
@@ -446,6 +447,17 @@ class AgaviWebRequest extends AgaviRequest
 						'is_uploaded_file' => false,
 					))
 				);
+			}
+		} elseif(in_array($this->getMethod(), array($methods['POST'], $methods['DELETE'], $methods['PUT'], $methods['PATCH'])) && isset($_SERVER['CONTENT_TYPE']) && preg_match('#^(application/json|text/json)(;[^;]+)*?$#', $_SERVER['CONTENT_TYPE'])) {
+			// a valid request and a JSON Payload
+			$json_content = file_get_contents('php://input');
+			$decoded_json_content = @json_decode($json_content, true);
+			if (is_array($decoded_json_content)) {
+				$_POST = array_merge($_POST, $decoded_json_content);
+			} else {
+				// invalid json. fix your client
+				header('Status: 400 Bad Request');
+				die();
 			}
 		} elseif($this->getMethod() == $methods['POST'] && (!isset($_SERVER['CONTENT_TYPE']) || (isset($_SERVER['CONTENT_TYPE']) && !preg_match('#^(application/x-www-form-urlencoded|multipart/form-data)(;[^;]+)*?$#', $_SERVER['CONTENT_TYPE'])))) {
 			// POST, but no regular urlencoded data or file upload. lets put the request payload into a file
