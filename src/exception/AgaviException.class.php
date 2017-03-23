@@ -46,7 +46,7 @@ class AgaviException extends Exception
 	 *
 	 * @deprecated Superseded by AgaviException::render()
 	 */
-	public static function printStackTrace(Exception $e, AgaviContext $context = null, AgaviExecutionContainer $container = null)
+	public static function printStackTrace($e, AgaviContext $context = null, AgaviExecutionContainer $container = null)
 	{
 		return self::render($e, $context, $container);
 	}
@@ -67,7 +67,7 @@ class AgaviException extends Exception
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.3
 	 */
-	public static function getFixedTrace(Exception $e, Exception $next = null)
+	public static function getFixedTrace($e, $next = null)
 	{
 		// fix stack trace in case it doesn't contain the exception origin as the first entry
 		$fixedTrace = $e->getTrace();
@@ -262,7 +262,7 @@ class AgaviException extends Exception
 	 * @author     David Zülke <dz@bitxtender.com>
 	 * @since      1.0.0
 	 */
-	public static function render(Exception $e, AgaviContext $context = null, AgaviExecutionContainer $container = null)
+	public static function render($e, AgaviContext $context = null, AgaviExecutionContainer $container = null)
 	{
 		// exit code is 70, EX_SOFTWARE, according to /usr/include/sysexits.h: http://cvs.opensolaris.org/source/xref/on/usr/src/head/sysexits.h
 		// nice touch: an exception template can change this value :)
