@@ -936,7 +936,7 @@ class AgaviTranslationManager
 			$locale = $type;
 		} elseif($type instanceof AgaviTimeZone) {
 			$zone = $type;
-		} elseif($type instanceof DateTime) {
+		} elseif($type instanceof DateTimeInterface) {
 			$time = $type;
 		} elseif(is_int($type)) {
 			$time = $type * AgaviDateDefinitions::MILLIS_PER_SECOND;
@@ -973,7 +973,7 @@ class AgaviTranslationManager
 			$c->setTimeZone($zone);
 		}
 
-		if($time instanceof DateTime) {
+		if($time instanceof DateTimeInterface) {
 			// FIXME: we can't use $time->getTimezone()->getName() here since that triggers
 			// https://github.com/facebook/hhvm/issues/1777 but luckily using format('e')
 			// works for both php and hhvm
