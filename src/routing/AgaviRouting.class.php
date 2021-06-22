@@ -1211,7 +1211,7 @@ abstract class AgaviRouting extends AgaviParameterHolder
 
 						// /* ! Only use the parameters from this route for expandVariables !
 						// matches are arrays with value and offset due to PREG_OFFSET_CAPTURE, and we want index 0, the value, which reset() will give us. Long story short, this removes the offset from the individual match
-						$matchvals = array_map('reset', $match);
+						$matchvals = array_map(function($v) { return reset($v);}, $match);
 						// */
 						/* ! Use the parameters from ALL routes for expandVariables !
 						$matchvals = $vars;
