@@ -59,11 +59,34 @@ class AgaviAutoloadConfigHandler extends AgaviXmlConfigHandler
 		$classes = $namespaces = array();
 
 		foreach($document->getConfigurationElements() as $configuration) {
-			if(!$configuration->has('autoloads')) {
+			if(!$configuration->has('autoloads') && !$configuration->has('autoload_folders')) {
 				continue;
 			}
 
 			// let's do our fancy work
+
+			// autoload_folders are recursive autoload entries. Each file matching the
+			// pattern, represents an autoload entry
+			foreach($configuration->get('autoload_folders') as $autoload_folder) {
+				$folder = AgaviToolkit::expandDirectives($autoload_folder->getValue());
+				
+				$it = new RecursiveDirectoryIterator($folder);
+				$it = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::SELF_FIRST);
+				$it = new RegexIterator(
+					$it,
+					$autoload_folder->getAttribute('pattern'),
+					RecursiveRegexIterator::GET_MATCH
+				);
+				
+				foreach($it as $source_file)
+				{
+					$file_name = $source_file[0];
+					$class_name = $source_file[1];
+					
+					$classes[$class_name] = realpath($file_name);
+				}
+			}
+
 			foreach($configuration->get('autoloads') as $autoload) {
 				// we can have variables in the filename
 				$path = AgaviToolkit::expandDirectives($autoload->getValue());

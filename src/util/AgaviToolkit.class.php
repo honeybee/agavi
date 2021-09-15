@@ -490,7 +490,6 @@ final class AgaviToolkit
 	    {
             $variables['shortActionName'] = self::extractShortActionName($variables['actionName']);
 	    }
-
 		return AgaviToolkit::expandVariables(
 			AgaviToolkit::expandDirectives(
 				AgaviConfig::get(

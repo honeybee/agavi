@@ -52,6 +52,8 @@ abstract class AgaviViewTestCase extends AgaviFragmentTestCase
 	{
 		$this->getContext()->getController()->initializeModule($this->moduleName);
 		$viewName = $this->normalizeViewName($this->viewName);
+		$this->container->setViewModuleName($this->moduleName);
+		$this->container->setViewName($viewName);
 		$viewInstance = $this->getContext()->getController()->createViewInstance($this->moduleName, $viewName);
 		$viewInstance->initialize($this->container);
 		return $viewInstance;
@@ -73,6 +75,75 @@ abstract class AgaviViewTestCase extends AgaviFragmentTestCase
 		$this->container->setViewInstance($this->createViewInstance());
 		$executionFilter = $this->createExecutionFilter();
 		$this->viewResult = $executionFilter->executeView($this->container);
+	}
+	
+	
+	/**
+	 * render the views results
+	 *
+	 * @throws Exception
+	 * @return AgaviResponse
+	 * 
+	 * @author Tom Anheyer <tom.anheyer@berlinonline.de>
+	 * @since 2018-05-25
+	 */
+	public function renderView ()
+	{
+	    $container = $this->container;
+	    $viewInstance = $container->getViewInstance();
+	    $attributes = & $viewInstance->getAttributes();
+	    $layers = $viewInstance->getLayers();
+	    $nextOutput = null;
+	    $output = [];
+	    $request = $this->getContext()->getRequest();
+	    $response = $container->getResponse();
+	    
+	    for ($i = 0; $i < count($layers); $i ++) {
+	        $layer = $layers[$i];
+	        $layerName = $layer->getName();
+	        foreach ($layer->getSlots() as $slotName => $slotContainer) {
+	            $slotResponse = $slotContainer->execute();
+	            AgaviArrayPathDefinition::setValue($slotName, $output, $slotResponse->getContent());
+	            $response->merge($slotResponse);
+	        }
+	    }
+	    $moreAssigns = [
+	            'container' => $container,
+	            'inner' => $nextOutput,
+	            'request_data' => $container->getRequestData(),
+	            'response' => $response,
+	            'validation_manager' => $container->getValidationManager(),
+	            'view' => $viewInstance
+	    ];
+	    // lock the request. can't be done outside the loop for the whole run, see #628
+	    $key = $request->toggleLock();
+	    try {
+	        $nextOutput = $layer->getRenderer()->render($layer, $attributes, $output, $moreAssigns);
+	    } 
+	    catch (Exception $e) {
+	        // we caught an exception... unlock the request and rethrow!
+	        $request->toggleLock($key);
+	        throw $e;
+	    }
+	    // and unlock the request again
+	    $request->toggleLock($key);
+	    $response->setContent($nextOutput);
+	    return $response;
+	}
+	
+	
+	/**
+	 * Retrieve the content set for this Response.
+	 *
+	 * @return     mixed The content set in this Response.
+	 *
+	 * @see        AgaviResponse::getContent()
+	 * @author     Tom Anheyer <tom.anheyer@berlinonline.de>
+	 * @since      2018-05-25
+	 */
+	protected function getContent() 
+	{
+	    return $this->container->getResponse()->getContent();
 	}
 	
 	/**

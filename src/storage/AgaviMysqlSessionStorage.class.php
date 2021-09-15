@@ -133,18 +133,18 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 		$db_id_col = $this->getParameter('db_id_col', 'sess_id');
 
 		// cleanup the session id, just in case
-		$id = mysql_real_escape_string($id, $this->resource);
+		$id = mysqli_real_escape_string($id, $this->resource);
 
 		// delete the record associated with this id
 		$sql = sprintf("DELETE FROM %s WHERE %s = '%s'", $db_table, $db_id_col, $id);
 
-		if(@mysql_query($sql, $this->resource)) {
+		if(@mysqli_query($sql, $this->resource)) {
 			return true;
 		}
 
 		// failed to destroy session
 		$error = 'MySQLSessionStorage cannot destroy session id "%s", error reported by server: "%s"';
-		$error = sprintf($error, $id, mysql_error($this->resource));
+		$error = sprintf($error, $id, mysqli_error($this->resource));
 		throw new AgaviDatabaseException($error);
 	}
 
@@ -179,19 +179,19 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 		if(is_numeric($time)) {
 			$time = (int)$time;
 		} else {
-			$time = "'" . mysql_real_escape_string($time, $this->resource) . "'";
+			$time = "'" . mysqli_real_escape_string($time, $this->resource) . "'";
 		}
 
 		// delete the records that are expired
 		$sql = sprintf('DELETE FROM %s WHERE %s < %s', $db_table, $db_time_col, $time);
 
-		if(@mysql_query($sql, $this->resource)) {
+		if(@mysqli_query($sql, $this->resource)) {
 			return true;
 		}
 
 		// failed to cleanup old sessions
 		$error = 'MySQLSessionStorage cannot delete old sessions, error reported by server: "%s"';
-		$error = sprintf($error, mysql_error($this->resource));
+		$error = sprintf($error, mysqli_error($this->resource));
 		throw new AgaviDatabaseException($error);
 	}
 
@@ -248,16 +248,16 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 		$db_time_col = $this->getParameter('db_time_col', 'sess_time');
 
 		// cleanup the session id, just in case
-		$id = mysql_real_escape_string($id, $this->resource);
+		$id = mysqli_real_escape_string($id, $this->resource);
 
 		// delete the record associated with this id
 		$sql = sprintf("SELECT %s FROM %s WHERE %s = '%s'", $db_data_col, $db_table, $db_id_col, $id);
 
-		$result = @mysql_query($sql, $this->resource);
+		$result = @mysqli_query($sql, $this->resource);
 
-		if($result != false && mysql_num_rows($result) > 0) {
+		if($result != false && mysqli_num_rows($result) > 0) {
 			// found the session
-			$data = mysql_fetch_row($result);
+			$data = mysqli_fetch_row($result);
 
 			return $data[0];
 		} elseif($result !== false) {
@@ -266,7 +266,7 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 
 		// failed to read session data
 		$error = 'MySQLSessionStorage cannot read session data for id "%s", error reported by server: "%s"';
-		$error = sprintf($error, $id, mysql_error($this->resource));
+		$error = sprintf($error, $id, mysqli_error($this->resource));
 		throw new AgaviDatabaseException($error);
 	}
 
@@ -298,14 +298,14 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 		$db_time_col = $this->getParameter('db_time_col', 'sess_time');
 
 		// cleanup the session id and data, just in case
-		$id   = mysql_real_escape_string($id, $this->resource);
-		$data = mysql_real_escape_string($data, $this->resource);
+		$id   = mysqli_real_escape_string($id, $this->resource);
+		$data = mysqli_real_escape_string($data, $this->resource);
 
 		$ts = date($this->getParameter('date_format', 'U'));
 		if(is_numeric($ts)) {
 			$ts = (int)$ts;
 		} else {
-			$ts = "'" . mysql_real_escape_string($ts) . "'";
+			$ts = "'" . mysqli_real_escape_string($this->resource, $ts) . "'";
 		}
 		// insert or update the record associated with this id
 		$sql = sprintf(
@@ -323,13 +323,13 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 			$db_time_col
 		);
 
-		$result = @mysql_query($sql, $this->resource);
+		$result = @mysqli_query($sql, $this->resource);
 		if($result !== false) {
 			return true;
 		} else {
 			// something went wrong
 			$error = 'MySQLSessionStorage cannot insert or update session "%s", error reported by server: "%s"';
-			$error = sprintf($error, $id, mysql_error($this->resource));
+			$error = sprintf($error, $id, mysqli_error($this->resource));
 			throw new AgaviDatabaseException($error);
 		}
 	}

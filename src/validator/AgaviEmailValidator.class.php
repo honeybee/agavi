@@ -33,29 +33,22 @@ class AgaviEmailValidator extends AgaviValidator
 {
 	/**
 	 * Validates the input.
-	 * 
+	 *
 	 * @return     bool The input is a valid email address.
-	 * 
+	 *
 	 * @author     Dominik del Bondio <ddb@bitxtender.com>
 	 * @author     Uwe Mesecke <uwe@mesecke.net>
 	 * @since      0.11.0
 	 */
 	protected function validate()
 	{
-		$data = $this->getData($this->getArgument());
-		if(!is_scalar($data)) {
-			// non scalar values would cause notices
-			$this->throwError();
-			return false;
-		}
-		
-		$extraChars = preg_quote('!#$%&\'*+-/=?^_`{|}~', '/');
-		if(!preg_match('/^[a-z0-9' . $extraChars . ']+(\.[a-z0-9' . $extraChars . ']+)*@[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,6}$/iD', $data)) {
-			$this->throwError();
-			return false;
-		}
-		
-		return true;
+	    $data = $this->getData($this->getArgument());
+	    if (false === filter_var($data, FILTER_VALIDATE_EMAIL)) {
+	        $this->throwError();
+	    }
+
+	    $this->export(filter_var($data, FILTER_SANITIZE_EMAIL), $this->getArgument());
+	    return true;
 	}
 }
 

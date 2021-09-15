@@ -327,6 +327,11 @@ class AgaviController extends AgaviParameterHolder
 			return $file;
 		}
 		
+		/* @todo Remove debug code AgaviController.class.php from 06.12.2017 */
+		$__logger = \AgaviContext::getInstance()->getLoggerManager();
+		$__logger->log(__METHOD__.":".__LINE__." : ".__FILE__, \AgaviILogger::DEBUG);
+		$__logger->log(print_r([$moduleName,$actionName,$file],1), \AgaviILogger::DEBUG);
+		
 		return false;
 	}
 	
@@ -416,6 +421,11 @@ class AgaviController extends AgaviParameterHolder
 		if(is_readable($file) && substr($viewName, 0, 1) !== '/') {
 			return $file;
 		}
+		
+		/* @todo Remove debug code AgaviController.class.php from 06.12.2017 */
+		$__logger = \AgaviContext::getInstance()->getLoggerManager();
+		$__logger->log(__METHOD__.":".__LINE__." : ".__FILE__, \AgaviILogger::DEBUG);
+		$__logger->log(print_r([$moduleName,$viewName,$file],1), \AgaviILogger::DEBUG);
 		
 		return false;
 	}

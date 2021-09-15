@@ -15,9 +15,9 @@
 // +---------------------------------------------------------------------------+
 
 /**
- * AgaviBasicSecurityFilter checks security by calling the getCredentials() 
- * method of the action. Once the credential has been acquired, 
- * AgaviBasicSecurityFilter verifies the user has the same credential 
+ * AgaviBasicSecurityFilter checks security by calling the getCredentials()
+ * method of the action. Once the credential has been acquired,
+ * AgaviBasicSecurityFilter verifies the user has the same credential
  * by calling the hasCredentials() method of SecurityUser.
  *
  * @package    agavi
@@ -46,11 +46,8 @@ class AgaviSecurityFilter extends AgaviFilter implements AgaviIActionFilter, Aga
 	 */
 	public function execute(AgaviFilterChain $filterChain, AgaviExecutionContainer $container)
 	{
-		// get the cool stuff
-		$context    = $this->getContext();
-		$user       = $context->getUser();
-
 		// get the current action instance
+		/* @var AgaviAction $actionInstance */
 		$actionInstance = $container->getActionInstance();
 
 		if(!$actionInstance->isSecure()) {
@@ -66,6 +63,10 @@ class AgaviSecurityFilter extends AgaviFilter implements AgaviIActionFilter, Aga
 
 		// get the credential required for this action
 		$credential = $actionInstance->getCredentials();
+
+		// get the cool stuff
+		$context    = $this->getContext();
+		$user       = $context->getUser();
 
 		// credentials can be anything you wish; a string, array, object, etc.
 		// as long as you add the same exact data to the user as a credential,

@@ -87,10 +87,6 @@ class AgaviTwigRenderer extends AgaviRenderer implements AgaviIReusableRenderer
 	 */
 	protected function createEngineInstance()
 	{
-		if(!class_exists(\Twig\Environment::class)) {
-			throw new \RuntimeException('Please install twigphp/twig via composer.');
-		}
-		
 		// loader is set in render()
 		$loader = new \Twig\Loader\FilesystemLoader([], AgaviConfig::get('core.template_dir'));
 		return new \Twig\Environment($loader, (array)$this->getParameter('options', array()));

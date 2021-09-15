@@ -68,7 +68,7 @@ class AgaviStreamTemplateLayer extends AgaviTemplateLayer
 		}
 
 		$args = array();
-		if(AgaviConfig::get('core.use_translation')) {
+		if($this->getParameter('use_translation',true) && AgaviConfig::get('core.use_translation')) {
 			// i18n is enabled, build a list of sprintf args with the locale identifier
 			foreach(AgaviLocale::getLookupPath($this->context->getTranslationManager()->getCurrentLocaleIdentifier()) as $identifier) {
 				$args[] = array('locale' => $identifier);
