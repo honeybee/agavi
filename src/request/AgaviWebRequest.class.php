@@ -289,7 +289,7 @@ class AgaviWebRequest extends AgaviRequest
 		$rla = ini_get('register_long_arrays');
 
 		// very first thing to do: remove magic quotes
-		if(get_magic_quotes_gpc()) {
+		if(function_exists('get_magic_quotes_gpc') && call_user_func('get_magic_quotes_gpc')) {
 			trigger_error('Support for php.ini directive "magic_quotes_gpc" is deprecated and will be dropped in Agavi 1.2. The setting is deprecated in PHP 5.3 and will be removed in PHP 5.4. Please refer to the PHP manual for details.', E_USER_DEPRECATED);
 			$_GET = self::clearMagicQuotes($_GET);
 			$_POST = self::clearMagicQuotes($_POST);
@@ -430,7 +430,7 @@ class AgaviWebRequest extends AgaviRequest
 			if(isset($_SERVER['CONTENT_TYPE']) && $this->getParameter('http_put_decode_urlencoded', true) && preg_match('#^application/x-www-form-urlencoded(;[^;]+)*?$#', $_SERVER['CONTENT_TYPE'])) {
 				// urlencoded data was sent, we can decode that
 				parse_str(file_get_contents('php://input'), $_POST);
-				if(function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) {
+				if(function_exists('get_magic_quotes_gpc') && call_user_func('get_magic_quotes_gpc')) {
 					$_POST = self::clearMagicQuotes($_POST);
 				}
 			} else {

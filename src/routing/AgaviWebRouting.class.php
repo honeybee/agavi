@@ -168,7 +168,7 @@ class AgaviWebRouting extends AgaviRouting
 			$parsedRuQuery = $parsedInput = '';
 			parse_str($ru['query'], $parsedRuQuery);
 			parse_str($this->input, $parsedInput);
-			if(get_magic_quotes_gpc()) {
+			if(function_exists('get_magic_quotes_gpc') && call_user_func('get_magic_quotes_gpc')) {
 				$parsedRuQuery = AgaviWebRequest::clearMagicQuotes($parsedRuQuery);
 				$parsedInput = AgaviWebRequest::clearMagicQuotes($parsedInput, false /* start on the first level */);
 			}
