@@ -166,12 +166,10 @@ class AgaviWebRouting extends AgaviRouting
 
 			// that was easy. now clean up $_GET and the Request
 			$parsedRuQuery = $parsedInput = '';
+			/** @var array $parsedRuQuery */
 			parse_str($ru['query'], $parsedRuQuery);
+			/** @var array $parsedInput */
 			parse_str($this->input, $parsedInput);
-			if(function_exists('get_magic_quotes_gpc') && call_user_func('get_magic_quotes_gpc')) {
-				$parsedRuQuery = AgaviWebRequest::clearMagicQuotes($parsedRuQuery);
-				$parsedInput = AgaviWebRequest::clearMagicQuotes($parsedInput, false /* start on the first level */);
-			}
 			foreach(array_diff(array_keys($parsedInput), array_keys($parsedRuQuery)) as $unset) {
 				// our element is in $_GET
 				unset($_GET[$unset]);
