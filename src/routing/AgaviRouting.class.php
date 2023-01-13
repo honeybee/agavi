@@ -1025,7 +1025,7 @@ abstract class AgaviRouting extends AgaviParameterHolder
 	 */
 	public function gen($route, array $params = array(), $options = array())
 	{
-		if(is_array($options) && array_key_exists('prefix', $options)) {
+		if(array_key_exists('prefix', $options)) {
 			$prefix = (string) $options['prefix'];
 		} else {
 			$prefix = $this->getPrefix();
@@ -1209,19 +1209,10 @@ abstract class AgaviRouting extends AgaviParameterHolder
 							}
 						}
 
-						// /* ! Only use the parameters from this route for expandVariables !
-						// matches are arrays with value and offset due to PREG_OFFSET_CAPTURE, and we want index 0, the value, which reset() will give us. Long story short, this removes the offset from the individual match
-						$matchvals = array_map(function($v) { return reset($v);}, $match);
-						// */
-						/* ! Use the parameters from ALL routes for expandVariables !
-						$matchvals = $vars;
-						// ignores need of the current route need to be added
-						$foreach($opts['ignores'] as $ignore) {
-							if(isset($match[$ignore]) && $match[$ignore][1] != -1) {
-								$matchvals[$ignore] = $match[$ignore][0];
-							}
-						}
-						// */
+						// matches are arrays with value and offset due to PREG_OFFSET_CAPTURE,
+						// and we want index 0, the value, which reset() will give us.
+						// Long story short, this removes the offset from the individual match
+						$matchvals = array_map(function($v) { return reset($v); }, $match);
 
 						if($opts['module']) {
 							$module = AgaviToolkit::expandVariables($opts['module'], $matchvals);
@@ -1497,8 +1488,6 @@ abstract class AgaviRouting extends AgaviParameterHolder
 		// set the list of matched route names as a request attribute
 		$rq->setAttribute('matched_routes', $matchedRoutes, 'org.agavi.routing');
 
-		$this->container = $container;
-
 		// return a list of matched route names
 		return $container;
 	}
@@ -1750,18 +1739,4 @@ abstract class AgaviRouting extends AgaviParameterHolder
 		return $value;
 	}
 
-	/**
-	 * Returns the first execution container from routing.
-	 *
-	 * @return     AgaviExecutionContainer
-	 *
-	 * @author     Steffen Gransow <agavi@mivesto.de>
-	 * @since      1.0.8
-	 */
-	public function getContainer()
-	{
-		return $this->container;
-	}
 }
-
-?>

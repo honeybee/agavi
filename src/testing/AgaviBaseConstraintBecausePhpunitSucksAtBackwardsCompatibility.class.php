@@ -13,6 +13,9 @@
 // |   End:                                                                    |
 // +---------------------------------------------------------------------------+
 
+use PHPUnit\Framework\Constraint\Constraint;
+use PHPUnit\Runner\Version;
+
 /**
  * Base constraint that caters for breaking changes between PHPUnit 3.5 and 3.6.
  * Concrete constraints must implement match().
@@ -27,7 +30,7 @@
  *
  * @version    $Id$
  */
-abstract class AgaviBaseConstraintBecausePhpunitSucksAtBackwardsCompatibility extends PHPUnit_Framework_Constraint
+abstract class AgaviBaseConstraintBecausePhpunitSucksAtBackwardsCompatibility extends Constraint
 {
 	/**
 	 * Overridden function to cover differences between PHPUnit 3.5 and 3.6.
@@ -41,14 +44,12 @@ abstract class AgaviBaseConstraintBecausePhpunitSucksAtBackwardsCompatibility ex
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.7
 	 */
-	public function evaluate($other, $description = '', $returnResult = false)
+	public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
 	{
-		if(version_compare(PHPUnit_Runner_Version::id(), '3.6', '<')) {
+		if(version_compare(Version::id(), '3.6', '<')) {
 			return $this->matches($other);
 		} else {
 			return parent::evaluate($other, $description, $returnResult);
 		}
 	}
 }
-
-?>

@@ -114,6 +114,7 @@ abstract class AgaviFlowTestCase extends AgaviPhpUnitTestCase implements AgaviIF
 	{
 		$scriptName = null;
 
+
 		$annotations = $this->getAnnotations();
 
 		if(!empty($annotations['method']['agaviDispatchScriptName'])) {
@@ -209,5 +210,3 @@ abstract class AgaviFlowTestCase extends AgaviPhpUnitTestCase implements AgaviIF
 		$this->assertNotTag($matcher, $this->response->getContent(), $message, $isHtml);
 	}
 }
-
-?>

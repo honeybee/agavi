@@ -41,9 +41,9 @@ class AgaviXsltProcessor extends XSLTProcessor
 	{
 		$luie = libxml_use_internal_errors(true);
 		libxml_clear_errors();
-		
+
 		parent::importStylesheet($stylesheet);
-		
+
 		// libxml_get_last_error() returns false if importStylesheet failed, libxml_get_errors() works nontheless. zomfg libxml.
 		// also, if we catch the errors here and throw an exception, we don't need an @ further down at transformToDoc().
 		if(libxml_get_last_error() !== false || count(libxml_get_errors())) {
@@ -56,16 +56,16 @@ class AgaviXsltProcessor extends XSLTProcessor
 			throw new Exception(
 				sprintf(
 					'Error%s occurred while importing the stylesheet "%s": ' . "\n\n%s",
-					count($errors) > 1 ? 's' : '', 
+					count($errors) > 1 ? 's' : '',
 					$stylesheet->documentURI,
 					implode("\n", $errors)
 				)
 			);
 		}
-		
+
 		libxml_use_internal_errors($luie);
 	}
-	
+
 	/**
 	 * Transform a node with a stylesheet.
 	 *
@@ -77,13 +77,13 @@ class AgaviXsltProcessor extends XSLTProcessor
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function transformToDoc($doc)
+	public function transformToDoc(object $document, ?string $returnClass = null): DOMDocument|false
 	{
 		$luie = libxml_use_internal_errors(true);
 		libxml_clear_errors();
-		
-		$result = parent::transformToDoc($doc);
-		
+
+		$result = parent::transformToDoc($document, $returnClass);
+
 		// check if result is false, too, as that means the transformation failed for reasons like infinite template recursion
 		if($result === false || libxml_get_last_error() !== false || count(libxml_get_errors())) {
 			$errors = array();
@@ -94,27 +94,25 @@ class AgaviXsltProcessor extends XSLTProcessor
 			libxml_use_internal_errors($luie);
 			throw new Exception(
 				sprintf(
-					'Error%s occurred while transforming the document using an XSL stylesheet: ' . "\n\n%s", 
-					count($errors) > 1 ? 's' : '', 
+					'Error%s occurred while transforming the document using an XSL stylesheet: ' . "\n\n%s",
+					count($errors) > 1 ? 's' : '',
 					implode("\n", $errors)
 				)
 			);
 		}
-		
+
 		libxml_use_internal_errors($luie);
-		
+
 		// turn this into an instance of the class that was passed in, rather than a regular DOMDocument
-		$class = $doc instanceof DOMDocument ? $doc : ($doc->ownerDocument ?: 'DOMDocument');
+		$class = $document instanceof DOMDocument ? $document : ($document->ownerDocument ?: 'DOMDocument');
 		$document = new $class();
 		$document->loadXML($result->saveXML());
-		
+
 		// save the URI just in case
 		$document->documentURI = $result->documentURI;
-		
+
 		unset($result);
-		
+
 		return $document;
 	}
 }
-
-?>

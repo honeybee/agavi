@@ -119,12 +119,12 @@ abstract class AgaviRequest extends AgaviAttributeHolder
 	public function initialize(AgaviContext $context, array $parameters = array())
 	{
 		$this->context = $context;
-		
+
 		if(isset($parameters['default_namespace'])) {
 			$this->defaultNamespace = $parameters['default_namespace'];
 			unset($parameters['default_namespace']);
 		}
-		
+
 		$this->setParameters($parameters);
 	}
 
@@ -189,29 +189,17 @@ abstract class AgaviRequest extends AgaviAttributeHolder
 			// remove raw post data
 			// can still be read from php://input, but we can't prevent that
 			unset($GLOBALS['HTTP_RAW_POST_DATA']);
-			
-			// nuke argc and argc if necessary
-			$rla = ini_get('register_long_arrays');
-			if($rla) {
-				trigger_error('Support for php.ini directive "register_long_arrays" is deprecated and will be dropped in Agavi 1.2. The setting is deprecated in PHP 5.3 and will be removed in PHP 5.4. Please refer to the PHP manual for details.', E_USER_DEPRECATED);
-			}
-			
+
 			if(isset($_SERVER['argc'])) {
 				$_SERVER['argc'] = 0;
 				if(isset($GLOBALS['argc'])) {
 					$GLOBALS['argc'] = 0;
-				}
-				if($rla) {
-					$GLOBALS['HTTP_SERVER_VARS']['argc'] = 0;
 				}
 			}
 			if(isset($_SERVER['argv'])) {
 				$_SERVER['argv'] = array();
 				if(isset($GLOBALS['argv'])) {
 					$GLOBALS['argv'] = array();
-				}
-				if($rla) {
-					$GLOBALS['HTTP_SERVER_VARS']['argv'] = array();
 				}
 			}
 		}
@@ -226,7 +214,7 @@ abstract class AgaviRequest extends AgaviAttributeHolder
 	public function shutdown()
 	{
 	}
-	
+
 	/**
 	 * Get a value by trying to find the given key in $_SERVER first, then in
 	 * $_ENV. If nothing was found, return the key, or the given default value.

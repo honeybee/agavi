@@ -13,6 +13,9 @@
 // |   End:                                                                    |
 // +---------------------------------------------------------------------------+
 
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+
 /**
  * A renderer produces the output as defined by a View
  *
@@ -30,9 +33,9 @@
 class AgaviTwigRenderer extends AgaviRenderer implements AgaviIReusableRenderer
 {
 	/**
-	 * @var        \Twig\Environment The template engine.
+	 * The template engine.
 	 */
-	protected $twig = null;
+	protected Environment $twig;
 
 	/**
 	 * @var        string A string with the default template file extension,
@@ -54,7 +57,7 @@ class AgaviTwigRenderer extends AgaviRenderer implements AgaviIReusableRenderer
 		unset($keys[array_search('twig', $keys)]);
 		return $keys;
 	}
-	
+
 	/**
 	 * Initialize this Renderer.
 	 *
@@ -67,7 +70,7 @@ class AgaviTwigRenderer extends AgaviRenderer implements AgaviIReusableRenderer
 	public function initialize(AgaviContext $context, array $parameters = array())
 	{
 		parent::initialize($context, $parameters);
-		
+
 		$this->setParameter('options', array_merge(
 			array(
 				'debug' => AgaviConfig::get('core.debug'),
@@ -76,41 +79,36 @@ class AgaviTwigRenderer extends AgaviRenderer implements AgaviIReusableRenderer
 			(array)$this->getParameter('options', array())
 		));
 	}
-	
+
 	/**
 	 * Load and create an instance of Twig.
-	 *
-	 * @return     \Twig\Environment
 	 *
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.6
 	 */
-	protected function createEngineInstance()
+	protected function createEngineInstance(): Environment
 	{
-		// loader is set in render()
-		$loader = new \Twig\Loader\FilesystemLoader([], AgaviConfig::get('core.template_dir'));
-		return new \Twig\Environment($loader, (array)$this->getParameter('options', array()));
+		$loader = new FilesystemLoader(null, AgaviConfig::get('core.template_dir'));
+		return new Environment($loader, (array)$this->getParameter('options', array()));
 	}
 
 	/**
 	 * Grab an initialized Twig instance.
 	 *
-	 * @return     \Twig\Environment
-	 *
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.6
 	 */
-	protected function getEngine()
+	protected function getEngine(): Environment
 	{
-		if(!$this->twig) {
+		if (!isset($this->twig)) {
 			$this->twig = $this->createEngineInstance();
-			
+
 			// assigns can be set as globals
-			foreach($this->assigns as $key => $getter) {
+			foreach ($this->assigns as $key => $getter) {
 				$this->twig->addGlobal($key, $this->context->$getter());
 			}
 		}
-		
+
 		return $this->twig;
 	}
 
@@ -130,9 +128,9 @@ class AgaviTwigRenderer extends AgaviRenderer implements AgaviIReusableRenderer
 	public function render(AgaviTemplateLayer $layer, array &$attributes = array(), array &$slots = array(), array &$moreAssigns = array())
 	{
 		$twig = $this->getEngine();
-		
+
 		$path = $layer->getResourceStreamIdentifier();
-		if($layer instanceof AgaviFileTemplateLayer) {
+		if ($layer instanceof AgaviFileTemplateLayer) {
 			$pathinfo = pathinfo($path);
 			// set the directory the template is in as the first path to load from, and the directory set on the layer second
 			// that way, including another template inside this template will look at e.g. a locale subdirectory first before falling back to the originally defined folder
@@ -141,40 +139,35 @@ class AgaviTwigRenderer extends AgaviRenderer implements AgaviIReusableRenderer
 				$layer->getParameter('directory'),
 			);
 			// also allow loading from the main template dir by default, and any other directories the user has set through configuration
-			foreach((array)$this->getParameter('template_dirs', array(AgaviConfig::get('core.template_dir'))) as $dir) {
+			foreach ((array)$this->getParameter('template_dirs', array(AgaviConfig::get('core.template_dir'))) as $dir) {
 				$paths[] = $dir;
 			}
-			$twig->setLoader(new \Twig\Loader\FilesystemLoader($paths));
+			$twig->setLoader(new FilesystemLoader($paths));
 			$source = $pathinfo['basename'];
-			$template = $twig->loadTemplate($source);
 		} else {
-			// a stream template or whatever; either way, it's something Twig can't load directly :S
-			$source = file_get_contents($path);
-			$template = $twig->createTemplate($source);
+			throw new AgaviViewException('Unsupported layer type: ' . get_class($layer));
 		}
 
 		$data = array();
-		
+
 		// template vars
-		if($this->extractVars) {
-			foreach($attributes as $name => $value) {
+		if ($this->extractVars) {
+			foreach ($attributes as $name => $value) {
 				$data[$name] = $value;
 			}
 		} else {
 			$data[$this->varName] = $attributes;
 		}
-		
+
 		// slots
 		$data[$this->slotsVarName] = $slots;
-		
+
 		// dynamic assigns (global ones were set in getEngine())
 		$finalMoreAssigns = self::buildMoreAssigns($moreAssigns, $this->moreAssignNames);
-		foreach($finalMoreAssigns as $key => $value) {
+		foreach ($finalMoreAssigns as $key => $value) {
 			$data[$key] = $value;
 		}
-		
-		return $template->render($data);
+
+		return $twig->render($source, $data);
 	}
 }
-
-?>

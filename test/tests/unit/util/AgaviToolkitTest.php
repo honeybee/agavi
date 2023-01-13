@@ -1,4 +1,7 @@
 <?php
+
+use PHPUnit\Framework\Error\Error;
+
 if(!class_exists('AgaviToolkit')) {
 	include(__DIR__ . '/../../../../src/util/AgaviToolkit.class.php');
 }
@@ -78,12 +81,12 @@ class AgaviToolkitTest extends AgaviPhpUnitTestCase
 	 */
 	public function testFloorDivideException()
 	{
-		$this->setExpectedException('AgaviException');
+		$this->expectException(AgaviException::class);
 		AgaviToolkit::floorDivide(6.9, 3.4, $rem);
 	}
 
 	 /**
-	 * @expectedException PHPUnit_Framework_Error
+	 * @expectedException Error
 	 */
 	public function testFloorDivideByZero()
 	{
@@ -134,7 +137,7 @@ class AgaviToolkitTest extends AgaviPhpUnitTestCase
 		$id1 = AgaviToolkit::uniqid('001');
 		$id2 = AgaviToolkit::uniqid('001');
 		$this->assertNotEquals($id1, $id2);
-		$this->assertContains('001', $id1);
+		$this->assertStringContainsString('001', $id1);
 	}
 
 	public function testCanonicalName()
@@ -154,7 +157,7 @@ class AgaviToolkitTest extends AgaviPhpUnitTestCase
 		$actual = AgaviToolkit::evaluateModuleDirective('foo', 'bar', $array);
 		$this->assertEquals($retval, $actual);
 	}
-	
+
 	/**
 	 * @dataProvider literalizeData
 	 */
@@ -163,12 +166,12 @@ class AgaviToolkitTest extends AgaviPhpUnitTestCase
 		foreach($settings as $key => $value) {
 			AgaviConfig::set($key, $value);
 		}
-		
+
 		$literalized = AgaviToolkit::literalize($rawValue);
-		
+
 		$this->assertEquals($expectedResult, $literalized);
 	}
-	
+
 	public function literalizeData()
 	{
 		return array(
@@ -190,7 +193,7 @@ class AgaviToolkitTest extends AgaviPhpUnitTestCase
 			'(int)5' => array(5, 5, array())
 		);
 	}
-	
+
 	/**
 	 * @dataProvider pathData
 	 */
@@ -202,7 +205,7 @@ class AgaviToolkitTest extends AgaviPhpUnitTestCase
 			$this->assertFalse(AgaviToolkit::isPathAbsolute($path));
 		}
 	}
-	
+
 	public function pathData()
 	{
 		$data = array(
@@ -216,17 +219,17 @@ class AgaviToolkitTest extends AgaviPhpUnitTestCase
 			'(unc)\\\\some.host' => array('\\\\some.host', true),
 			'(unc)\\\\some.host\\foo' => array('\\\\some.host\\foo', true),
 			'(unc)\\some.host\\foo' => array('\\some.host\\foo', false),
-			
+
 			'/' => array('/', true),
 			'/root' => array('/root', true),
 			'/FoO/bAR' => array('/FoO/bAR', true),
 			'./FoO/bAR' => array('./FoO/bAR', false),
 			'../FoO/bAR' => array('../FoO/bAR', false),
-			
+
 			// (php does not support backslashes on *nix)
 			'\\foo' => array('\\foo', false),
 			'\\foo\\bar' => array('\\foo\\bar', false),
-			
+
 			'c:' => array('c:', false),
 			's/foo/bar' => array('s/foo/bar', false),
 			'c:foo' => array('c:foo', false)
@@ -236,7 +239,7 @@ class AgaviToolkitTest extends AgaviPhpUnitTestCase
 		}
 		return $data;
 	}
-	
+
 	/**
 	 * @dataProvider urlData
 	 */
@@ -244,7 +247,7 @@ class AgaviToolkitTest extends AgaviPhpUnitTestCase
 	{
 		$this->assertEquals($url, AgaviToolkit::buildUrl($parts));
 	}
-	
+
 	public function urlData()
 	{
 		return array(
@@ -298,7 +301,7 @@ class AgaviToolkitTest extends AgaviPhpUnitTestCase
 			),
 		);
 	}
-	
+
 }
 
 ?>

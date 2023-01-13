@@ -13,6 +13,13 @@
 // |   End:                                                                    |
 // +---------------------------------------------------------------------------+
 
+use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Test;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Util\Blacklist;
+use PHPUnit\Util\GlobalState;
+use SebastianBergmann\Template\Template;
+
 /**
  * AgaviPhpUnitTestCase is the base class for all Agavi Testcases.
  *
@@ -27,7 +34,7 @@
  *
  * @version    $Id$
  */
-abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
+abstract class AgaviPhpUnitTestCase extends TestCase
 {
 	/**
 	 * @var        string  the name of the environment to bootstrap in isolated tests.
@@ -45,9 +52,11 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 	protected $clearIsolationCache = false;
 
 	/**
-	 * @var         string store the dataName since we can't access it from PHPUnit_Framework_TestCase.
+	 * @var         string store the dataName since we can't access it from PHPUnit\Framework\TestCase.
 	 */
 	protected $myDataName;
+
+	private static $annotationCache = array();
 
 	/**
 	 * Constructs a test case with the given name.
@@ -261,13 +270,13 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 		}
 
 		// FIXME: added by phpunit 4.x
-		if(class_exists('PHPUnit_Util_Blacklist')) {
-			$blacklist = new PHPUnit_Util_Blacklist;
+		if(class_exists(Blacklist::class)) {
+			$blacklist = new Blacklist;
 			$isBlacklisted = function($file) use ($testFile, $blacklist) {
 				return $file === $testFile || $blacklist->isBlacklisted($file);
 			};
-		} elseif(is_callable(array('PHPUnit_Util_GlobalState', 'phpunitFiles'))) {
-			$blacklist = PHPUnit_Util_GlobalState::phpunitFiles();
+		} elseif(is_callable(array(GlobalState::class, 'phpunitFiles'))) {
+			$blacklist = GlobalState::phpunitFiles();
 			$isBlacklisted = function($file) use ($testFile, $blacklist) {
 				return $file === $testFile || isset($blacklist[$file]);
 			};
@@ -296,10 +305,8 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 	 * @author       Felix Gilcher <felix.gilcher@bitextender.com>
 	 * @since        1.0.2
 	*/
-	protected function prepareTemplate(Text_Template $template)
+	protected function prepareTemplate(Template $template)
 	{
-		parent::prepareTemplate($template);
-
 		// FIXME: workaround for php unit bug (https://github.com/sebastianbergmann/phpunit/pull/1338)
 		$template->setVar(array(
 			'dataName' => "'.(" . var_export($this->myDataName, true) . ").'"
@@ -320,7 +327,6 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 				}
 			});
 		', var_export($this->getDependendClasses(), true));
-
 
 		// these constants are either used by out bootstrap wrapper script
 		// (AGAVI_TESTING_ORIGINAL_PHPUNIT_BOOTSTRAP) or can be used by the user's
@@ -391,6 +397,775 @@ abstract class AgaviPhpUnitTestCase extends PHPUnit_Framework_TestCase
 			$flag = AgaviToolkit::literalize($annotations['class']['agaviBootstrap'][0]);
 		}
 		return $flag;
+	}
+
+	/**
+	 * Returns the annotations for this test.
+	 *
+	 * @return array
+	 */
+	public function getAnnotations()
+	{
+		return self::parseTestMethodAnnotations(
+			get_class($this),
+			$this->getName()
+		);
+	}
+
+
+	/**
+	 * @param  string $className
+	 * @param  string $methodName
+	 * @return array
+	 * @throws ReflectionException
+	 * @since  Method available since Release 3.4.0
+	 */
+	public static function parseTestMethodAnnotations($className, $methodName = '')
+	{
+		if (!isset(self::$annotationCache[$className])) {
+			$class = new ReflectionClass($className);
+			self::$annotationCache[$className] = self::parseAnnotations($class->getDocComment());
+		}
+
+		if (!empty($methodName) && !isset(self::$annotationCache[$className . '::' . $methodName])) {
+			$method = new ReflectionMethod($className, $methodName);
+			self::$annotationCache[$className . '::' . $methodName] = self::parseAnnotations($method->getDocComment());
+		}
+
+		return array(
+		  'class'  => self::$annotationCache[$className],
+		  'method' => !empty($methodName) ? self::$annotationCache[$className . '::' . $methodName] : array()
+		);
+	}
+
+
+	/**
+	 * @param  string $docblock
+	 * @return array
+	 * @since  Method available since Release 3.4.0
+	 */
+	private static function parseAnnotations($docblock)
+	{
+		$annotations = array();
+
+		if (preg_match_all('/@(?P<name>[A-Za-z_-]+)(?:[ \t]+(?P<value>.*?))?[ \t]*\r?$/m', $docblock, $matches)) {
+			$numMatches = count($matches[0]);
+
+			for ($i = 0; $i < $numMatches; ++$i) {
+				$annotations[$matches['name'][$i]][] = $matches['value'][$i];
+			}
+		}
+
+		return $annotations;
+	}
+
+	/**
+	 * Evaluate an HTML or XML string and assert its structure and/or contents.
+	 *
+	 * The first argument ($matcher) is an associative array that specifies the
+	 * match criteria for the assertion:
+	 *
+	 *  - `id`           : the node with the given id attribute must match the
+	 *                     corresponding value.
+	 *  - `tag`          : the node type must match the corresponding value.
+	 *  - `attributes`   : a hash. The node's attributes must match the
+	 *                     corresponding values in the hash.
+	 *  - `content`      : The text content must match the given value.
+	 *  - `parent`       : a hash. The node's parent must match the
+	 *                     corresponding hash.
+	 *  - `child`        : a hash. At least one of the node's immediate children
+	 *                     must meet the criteria described by the hash.
+	 *  - `ancestor`     : a hash. At least one of the node's ancestors must
+	 *                     meet the criteria described by the hash.
+	 *  - `descendant`   : a hash. At least one of the node's descendants must
+	 *                     meet the criteria described by the hash.
+	 *  - `children`     : a hash, for counting children of a node.
+	 *                     Accepts the keys:
+	 *    - `count`        : a number which must equal the number of children
+	 *                       that match
+	 *    - `less_than`    : the number of matching children must be greater
+	 *                       than this number
+	 *    - `greater_than` : the number of matching children must be less than
+	 *                       this number
+	 *    - `only`         : another hash consisting of the keys to use to match
+	 *                       on the children, and only matching children will be
+	 *                       counted
+	 *
+	 * <code>
+	 * // Matcher that asserts that there is an element with an id="my_id".
+	 * $matcher = array('id' => 'my_id');
+	 *
+	 * // Matcher that asserts that there is a "span" tag.
+	 * $matcher = array('tag' => 'span');
+	 *
+	 * // Matcher that asserts that there is a "span" tag with the content
+	 * // "Hello World".
+	 * $matcher = array('tag' => 'span', 'content' => 'Hello World');
+	 *
+	 * // Matcher that asserts that there is a "span" tag with content matching
+	 * // the regular expression pattern.
+	 * $matcher = array('tag' => 'span', 'content' => 'regexp:/Try P(HP|ython)/');
+	 *
+	 * // Matcher that asserts that there is a "span" with an "list" class
+	 * // attribute.
+	 * $matcher = array(
+	 *   'tag'        => 'span',
+	 *   'attributes' => array('class' => 'list')
+	 * );
+	 *
+	 * // Matcher that asserts that there is a "span" inside of a "div".
+	 * $matcher = array(
+	 *   'tag'    => 'span',
+	 *   'parent' => array('tag' => 'div')
+	 * );
+	 *
+	 * // Matcher that asserts that there is a "span" somewhere inside a
+	 * // "table".
+	 * $matcher = array(
+	 *   'tag'      => 'span',
+	 *   'ancestor' => array('tag' => 'table')
+	 * );
+	 *
+	 * // Matcher that asserts that there is a "span" with at least one "em"
+	 * // child.
+	 * $matcher = array(
+	 *   'tag'   => 'span',
+	 *   'child' => array('tag' => 'em')
+	 * );
+	 *
+	 * // Matcher that asserts that there is a "span" containing a (possibly
+	 * // nested) "strong" tag.
+	 * $matcher = array(
+	 *   'tag'        => 'span',
+	 *   'descendant' => array('tag' => 'strong')
+	 * );
+	 *
+	 * // Matcher that asserts that there is a "span" containing 5-10 "em" tags
+	 * // as immediate children.
+	 * $matcher = array(
+	 *   'tag'      => 'span',
+	 *   'children' => array(
+	 *     'less_than'    => 11,
+	 *     'greater_than' => 4,
+	 *     'only'         => array('tag' => 'em')
+	 *   )
+	 * );
+	 *
+	 * // Matcher that asserts that there is a "div", with an "ul" ancestor and
+	 * // a "li" parent (with class="enum"), and containing a "span" descendant
+	 * // that contains an element with id="my_test" and the text "Hello World".
+	 * $matcher = array(
+	 *   'tag'        => 'div',
+	 *   'ancestor'   => array('tag' => 'ul'),
+	 *   'parent'     => array(
+	 *     'tag'        => 'li',
+	 *     'attributes' => array('class' => 'enum')
+	 *   ),
+	 *   'descendant' => array(
+	 *     'tag'   => 'span',
+	 *     'child' => array(
+	 *       'id'      => 'my_test',
+	 *       'content' => 'Hello World'
+	 *     )
+	 *   )
+	 * );
+	 *
+	 * // Use assertTag() to apply a $matcher to a piece of $html.
+	 * $this->assertTag($matcher, $html);
+	 *
+	 * // Use assertTag() to apply a $matcher to a piece of $xml.
+	 * $this->assertTag($matcher, $xml, '', false);
+	 * </code>
+	 *
+	 * The second argument ($actual) is a string containing either HTML or
+	 * XML text to be tested.
+	 *
+	 * The third argument ($message) is an optional message that will be
+	 * used if the assertion fails.
+	 *
+	 * The fourth argument ($html) is an optional flag specifying whether
+	 * to load the $actual string into a DOMDocument using the HTML or
+	 * XML load strategy.  It is true by default, which assumes the HTML
+	 * load strategy.  In many cases, this will be acceptable for XML as well.
+	 *
+	 * @param array  $matcher
+	 * @param string $actual
+	 * @param string $message
+	 * @param bool   $isHtml
+	 * @since  Method available since Release 3.3.0
+	 * @deprecated
+	 * @codeCoverageIgnore
+	 */
+	public static function assertTag($matcher, $actual, $message = '', $isHtml = true)
+	{
+		trigger_error(__METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+
+		$dom     = self::load($actual, $isHtml);
+		$tags    = self::findNodes($dom, $matcher, $isHtml);
+		$matched = count($tags) > 0 && $tags[0] instanceof DOMNode;
+
+		self::assertTrue($matched, $message);
+	}
+
+	/**
+	 * This assertion is the exact opposite of assertTag().
+	 *
+	 * Rather than asserting that $matcher results in a match, it asserts that
+	 * $matcher does not match.
+	 *
+	 * @param array  $matcher
+	 * @param string $actual
+	 * @param string $message
+	 * @param bool   $isHtml
+	 * @since  Method available since Release 3.3.0
+	 * @deprecated
+	 * @codeCoverageIgnore
+	 */
+	public static function assertNotTag($matcher, $actual, $message = '', $isHtml = true)
+	{
+		trigger_error(__METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+
+		$dom     = self::load($actual, $isHtml);
+		$tags    = self::findNodes($dom, $matcher, $isHtml);
+		$matched = count($tags) > 0 && $tags[0] instanceof DOMNode;
+
+		self::assertFalse($matched, $message);
+	}
+
+
+	/**
+	 * Gets elements by case insensitive tagname.
+	 *
+	 * @param  DOMDocument $dom
+	 * @param  string      $tag
+	 * @return DOMNodeList
+	 * @since  Method available since Release 3.4.0
+	 */
+	protected static function getElementsByCaseInsensitiveTagName(DOMDocument $dom, $tag)
+	{
+		$elements = $dom->getElementsByTagName(strtolower($tag));
+
+		if ($elements->length == 0) {
+			$elements = $dom->getElementsByTagName(strtoupper($tag));
+		}
+
+		return $elements;
+	}
+
+	/**
+	 * Get the text value of this node's child text node.
+	 *
+	 * @param  DOMNode $node
+	 * @return string
+	 * @since  Method available since Release 3.3.0
+	 * @author Mike Naberezny <mike@maintainable.com>
+	 * @author Derek DeVries <derek@maintainable.com>
+	 */
+	protected static function getNodeText(DOMNode $node)
+	{
+		if (!$node->childNodes instanceof DOMNodeList) {
+			return '';
+		}
+
+		$result = '';
+
+		foreach ($node->childNodes as $childNode) {
+			if ($childNode->nodeType === XML_TEXT_NODE) {
+				$result .= trim($childNode->data) . ' ';
+			} else {
+				$result .= self::getNodeText($childNode);
+			}
+		}
+
+		return str_replace('  ', ' ', $result);
+	}
+
+
+	/**
+	 * Recursively get flat array of all descendants of this node.
+	 *
+	 * @param  DOMNode $node
+	 * @return array
+	 * @since  Method available since Release 3.3.0
+	 * @author Mike Naberezny <mike@maintainable.com>
+	 * @author Derek DeVries <derek@maintainable.com>
+	 */
+	protected static function getDescendants(DOMNode $node)
+	{
+		$allChildren = array();
+		$childNodes  = $node->childNodes ? $node->childNodes : array();
+
+		foreach ($childNodes as $child) {
+			if ($child->nodeType === XML_CDATA_SECTION_NODE ||
+				$child->nodeType === XML_TEXT_NODE) {
+				continue;
+			}
+
+			$children    = self::getDescendants($child);
+			$allChildren = array_merge($allChildren, $children, array($child));
+		}
+
+		return isset($allChildren) ? $allChildren : array();
+	}
+
+
+	/**
+	 * Parse out the options from the tag using DOM object tree.
+	 *
+	 * @param  DOMDocument $dom
+	 * @param  array       $options
+	 * @param  boolean     $isHtml
+	 * @return array
+	 * @since  Method available since Release 3.3.0
+	 * @author Mike Naberezny <mike@maintainable.com>
+	 * @author Derek DeVries <derek@maintainable.com>
+	 */
+	public static function findNodes(DOMDocument $dom, array $options, $isHtml = TRUE)
+	{
+		$valid = array(
+		  'id', 'class', 'tag', 'content', 'attributes', 'parent',
+		  'child', 'ancestor', 'descendant', 'children'
+		);
+
+		$filtered = array();
+		$options  = self::assertValidKeys($options, $valid);
+
+		// find the element by id
+		if ($options['id']) {
+			$options['attributes']['id'] = $options['id'];
+		}
+
+		if ($options['class']) {
+			$options['attributes']['class'] = $options['class'];
+		}
+
+		// find the element by a tag type
+		if ($options['tag']) {
+			if ($isHtml) {
+				$elements = self::getElementsByCaseInsensitiveTagName(
+				  $dom, $options['tag']
+				);
+			} else {
+				$elements = $dom->getElementsByTagName($options['tag']);
+			}
+
+			foreach ($elements as $element) {
+				$nodes[] = $element;
+			}
+
+			if (empty($nodes)) {
+				return FALSE;
+			}
+		}
+
+		// no tag selected, get them all
+		else {
+			$tags = array(
+			  'a', 'abbr', 'acronym', 'address', 'area', 'b', 'base', 'bdo',
+			  'big', 'blockquote', 'body', 'br', 'button', 'caption', 'cite',
+			  'code', 'col', 'colgroup', 'dd', 'del', 'div', 'dfn', 'dl',
+			  'dt', 'em', 'fieldset', 'form', 'frame', 'frameset', 'h1', 'h2',
+			  'h3', 'h4', 'h5', 'h6', 'head', 'hr', 'html', 'i', 'iframe',
+			  'img', 'input', 'ins', 'kbd', 'label', 'legend', 'li', 'link',
+			  'map', 'meta', 'noframes', 'noscript', 'object', 'ol', 'optgroup',
+			  'option', 'p', 'param', 'pre', 'q', 'samp', 'script', 'select',
+			  'small', 'span', 'strong', 'style', 'sub', 'sup', 'table',
+			  'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'title',
+			  'tr', 'tt', 'ul', 'var'
+			);
+
+			foreach ($tags as $tag) {
+				if ($isHtml) {
+					$elements = self::getElementsByCaseInsensitiveTagName(
+					  $dom, $tag
+					);
+				} else {
+					$elements = $dom->getElementsByTagName($tag);
+				}
+
+				foreach ($elements as $element) {
+					$nodes[] = $element;
+				}
+			}
+
+			if (empty($nodes)) {
+				return FALSE;
+			}
+		}
+
+		// filter by attributes
+		if ($options['attributes']) {
+			foreach ($nodes as $node) {
+				$invalid = FALSE;
+
+				foreach ($options['attributes'] as $name => $value) {
+					// match by regexp if like "regexp:/foo/i"
+					if (preg_match('/^regexp\s*:\s*(.*)/i', $value, $matches)) {
+						if (!preg_match($matches[1], $node->getAttribute($name))) {
+							$invalid = TRUE;
+						}
+					}
+
+					// class can match only a part
+					else if ($name == 'class') {
+						// split to individual classes
+						$findClasses = explode(
+						  ' ', preg_replace("/\s+/", " ", $value)
+						);
+
+						$allClasses = explode(
+						  ' ',
+						  preg_replace("/\s+/", " ", $node->getAttribute($name))
+						);
+
+						// make sure each class given is in the actual node
+						foreach ($findClasses as $findClass) {
+							if (!in_array($findClass, $allClasses)) {
+								$invalid = TRUE;
+							}
+						}
+					}
+
+					// match by exact string
+					else {
+						if ($node->getAttribute($name) != $value) {
+							$invalid = TRUE;
+						}
+					}
+				}
+
+				// if every attribute given matched
+				if (!$invalid) {
+					$filtered[] = $node;
+				}
+			}
+
+			$nodes    = $filtered;
+			$filtered = array();
+
+			if (empty($nodes)) {
+				return FALSE;
+			}
+		}
+
+		// filter by content
+		if ($options['content'] !== NULL) {
+			foreach ($nodes as $node) {
+				$invalid = FALSE;
+
+				// match by regexp if like "regexp:/foo/i"
+				if (preg_match('/^regexp\s*:\s*(.*)/i', $options['content'], $matches)) {
+					if (!preg_match($matches[1], self::getNodeText($node))) {
+						$invalid = TRUE;
+					}
+				}
+
+				// match by exact string
+				else if (strstr(self::getNodeText($node), $options['content']) === FALSE) {
+					$invalid = TRUE;
+				}
+
+				if (!$invalid) {
+					$filtered[] = $node;
+				}
+			}
+
+			$nodes    = $filtered;
+			$filtered = array();
+
+			if (empty($nodes)) {
+				return FALSE;
+			}
+		}
+
+		// filter by parent node
+		if ($options['parent']) {
+			$parentNodes = self::findNodes($dom, $options['parent']);
+			$parentNode  = isset($parentNodes[0]) ? $parentNodes[0] : NULL;
+
+			foreach ($nodes as $node) {
+				if ($parentNode !== $node->parentNode) {
+					break;
+				}
+
+				$filtered[] = $node;
+			}
+
+			$nodes    = $filtered;
+			$filtered = array();
+
+			if (empty($nodes)) {
+				return FALSE;
+			}
+		}
+
+		// filter by child node
+		if ($options['child']) {
+			$childNodes = self::findNodes($dom, $options['child']);
+			$childNodes = !empty($childNodes) ? $childNodes : array();
+
+			foreach ($nodes as $node) {
+				foreach ($node->childNodes as $child) {
+					foreach ($childNodes as $childNode) {
+						if ($childNode === $child) {
+							$filtered[] = $node;
+						}
+					}
+				}
+			}
+
+			$nodes    = $filtered;
+			$filtered = array();
+
+			if (empty($nodes)) {
+				return FALSE;
+			}
+		}
+
+		// filter by ancestor
+		if ($options['ancestor']) {
+			$ancestorNodes = self::findNodes($dom, $options['ancestor']);
+			$ancestorNode  = isset($ancestorNodes[0]) ? $ancestorNodes[0] : NULL;
+
+			foreach ($nodes as $node) {
+				$parent = $node->parentNode;
+
+				while ($parent->nodeType != XML_HTML_DOCUMENT_NODE) {
+					if ($parent === $ancestorNode) {
+						$filtered[] = $node;
+					}
+
+					$parent = $parent->parentNode;
+				}
+			}
+
+			$nodes    = $filtered;
+			$filtered = array();
+
+			if (empty($nodes)) {
+				return FALSE;
+			}
+		}
+
+		// filter by descendant
+		if ($options['descendant']) {
+			$descendantNodes = self::findNodes($dom, $options['descendant']);
+			$descendantNodes = !empty($descendantNodes) ? $descendantNodes : array();
+
+			foreach ($nodes as $node) {
+				foreach (self::getDescendants($node) as $descendant) {
+					foreach ($descendantNodes as $descendantNode) {
+						if ($descendantNode === $descendant) {
+							$filtered[] = $node;
+						}
+					}
+				}
+			}
+
+			$nodes    = $filtered;
+			$filtered = array();
+
+			if (empty($nodes)) {
+				return FALSE;
+			}
+		}
+
+		// filter by children
+		if ($options['children']) {
+			$validChild   = array('count', 'greater_than', 'less_than', 'only');
+			$childOptions = self::assertValidKeys(
+							  $options['children'], $validChild
+							);
+
+			foreach ($nodes as $node) {
+				$childNodes = $node->childNodes;
+
+				foreach ($childNodes as $childNode) {
+					if ($childNode->nodeType !== XML_CDATA_SECTION_NODE &&
+						$childNode->nodeType !== XML_TEXT_NODE) {
+						$children[] = $childNode;
+					}
+				}
+
+				// we must have children to pass this filter
+				if (!empty($children)) {
+					// exact count of children
+					if ($childOptions['count'] !== NULL) {
+						if (count($children) !== $childOptions['count']) {
+							break;
+						}
+					}
+
+					// range count of children
+					else if ($childOptions['less_than']    !== NULL &&
+							$childOptions['greater_than'] !== NULL) {
+						if (count($children) >= $childOptions['less_than'] ||
+							count($children) <= $childOptions['greater_than']) {
+							break;
+						}
+					}
+
+					// less than a given count
+					else if ($childOptions['less_than'] !== NULL) {
+						if (count($children) >= $childOptions['less_than']) {
+							break;
+						}
+					}
+
+					// more than a given count
+					else if ($childOptions['greater_than'] !== NULL) {
+						if (count($children) <= $childOptions['greater_than']) {
+							break;
+						}
+					}
+
+					// match each child against a specific tag
+					if ($childOptions['only']) {
+						$onlyNodes = self::findNodes(
+						  $dom, $childOptions['only']
+						);
+
+						// try to match each child to one of the 'only' nodes
+						foreach ($children as $child) {
+							$matched = FALSE;
+
+							foreach ($onlyNodes as $onlyNode) {
+								if ($onlyNode === $child) {
+									$matched = TRUE;
+								}
+							}
+
+							if (!$matched) {
+								break(2);
+							}
+						}
+					}
+
+					$filtered[] = $node;
+				}
+			}
+
+			$nodes    = $filtered;
+			$filtered = array();
+
+			if (empty($nodes)) {
+				return;
+			}
+		}
+
+		// return the first node that matches all criteria
+		return !empty($nodes) ? $nodes : array();
+	}
+
+
+	/**
+	 * Load an $actual document into a DOMDocument.  This is called
+	 * from the selector assertions.
+	 *
+	 * If $actual is already a DOMDocument, it is returned with
+	 * no changes.  Otherwise, $actual is loaded into a new DOMDocument
+	 * as either HTML or XML, depending on the value of $isHtml.
+	 *
+	 * Note: prior to PHPUnit 3.3.0, this method loaded a file and
+	 * not a string as it currently does.  To load a file into a
+	 * DOMDocument, use loadFile() instead.
+	 *
+	 * @param  string|DOMDocument  $actual
+	 * @param  boolean             $isHtml
+	 * @param  string              $filename
+	 * @return DOMDocument
+	 * @since  Method available since Release 3.3.0
+	 * @author Mike Naberezny <mike@maintainable.com>
+	 * @author Derek DeVries <derek@maintainable.com>
+	 */
+	public static function load($actual, $isHtml = FALSE, $filename = '')
+	{
+		if ($actual instanceof DOMDocument) {
+			return $actual;
+		}
+
+		$internal  = libxml_use_internal_errors(TRUE);
+		$reporting = error_reporting(0);
+		$dom       = new DOMDocument;
+
+		if ($isHtml) {
+			$loaded = $dom->loadHTML($actual);
+		} else {
+			$loaded = $dom->loadXML($actual);
+		}
+
+		libxml_use_internal_errors($internal);
+		error_reporting($reporting);
+
+		if ($loaded === FALSE) {
+			$message = '';
+
+			foreach (libxml_get_errors() as $error) {
+				$message .= $error->message;
+			}
+
+			if ($filename != '') {
+				throw new Exception(
+				  sprintf(
+					'Could not load "%s".%s',
+
+					$filename,
+					$message != '' ? "\n" . $message : ''
+				  )
+				);
+			} else {
+				throw new Exception($message);
+			}
+		}
+
+		return $dom;
+	}
+
+
+	/**
+	 * Validate list of keys in the associative array.
+	 *
+	 * @param  array $hash
+	 * @param  array $validKeys
+	 * @return array
+	 * @throws InvalidArgumentException
+	 * @since  Method available since Release 3.3.0
+	 * @author Mike Naberezny <mike@maintainable.com>
+	 * @author Derek DeVries <derek@maintainable.com>
+	 */
+	public static function assertValidKeys(array $hash, array $validKeys)
+	{
+		$valids = array();
+
+		// Normalize validation keys so that we can use both indexed and
+		// associative arrays.
+		foreach ($validKeys as $key => $val) {
+			is_int($key) ? $valids[$val] = NULL : $valids[$key] = $val;
+		}
+
+		$validKeys = array_keys($valids);
+
+		// Check for invalid keys.
+		foreach ($hash as $key => $value) {
+			if (!in_array($key, $validKeys)) {
+				$unknown[] = $key;
+			}
+		}
+
+		if (!empty($unknown)) {
+			throw new InvalidArgumentException(
+			  'Unknown key(s): ' . implode(', ', $unknown)
+			);
+		}
+
+		// Add default values for any valid keys that are empty.
+		foreach ($valids as $key => $value) {
+			if (!isset($hash[$key])) {
+				$hash[$key] = $value;
+			}
+		}
+
+		return $hash;
 	}
 
 }

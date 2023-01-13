@@ -36,20 +36,20 @@ class AgaviRecursiveDirectoryFilterIterator extends RecursiveFilterIterator
 	 * @var          array
 	 */
 	public static $defaultExcludes = array('.', '..', '.svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr');
-	
+
 	/**
 	 * @var          array the list of excludes
 	 */
 	protected $excludes = array();
-	
+
 	/**
 	 * @var          array the list of include patterns
 	 */
 	protected $includes = array();
-	
+
 	/**
 	 * Creates a new AgaviRecursiveDirectoryFilterIterator.
-	 * 
+	 *
 	 * @var          RecursiveDirectoryIterator the directory iterator to decorate
 	 * @var          array the list of include patterns (regular expressions)
 	 * @var          array the list of exclude patterns (literal)
@@ -63,21 +63,21 @@ class AgaviRecursiveDirectoryFilterIterator extends RecursiveFilterIterator
 		} else {
 			$this->excludes = $excludes;
 		}
-		
+
 		foreach($includes as $pattern) {
 			$this->includes[] = '!'.str_replace('!', '\!', $pattern).'!i';
 		}
 	}
-	
+
 	/**
 	 * Checks whether the current item is included.
-	 * 
+	 *
 	 * An item is included if it is matched by any of the include expressions
 	 * and none of the exclude patterns.
-	 * 
-	 * @return       boolean true if the item is included
+	 *
+	 * @return       true if the item is included
 	 */
-	public function accept()
+	public function accept(): bool
 	{
 		if(!$this->isIncluded()) {
 			return false;
@@ -85,15 +85,15 @@ class AgaviRecursiveDirectoryFilterIterator extends RecursiveFilterIterator
 		if($this->isExcluded()) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Checks whether the current item is matched by an include expression.
-	 * 
+	 *
 	 * Directories are always included.
-	 * 
+	 *
 	 * @return       boolean true if the items path matches an include expression
 	 */
 	protected function isIncluded() {
@@ -108,33 +108,31 @@ class AgaviRecursiveDirectoryFilterIterator extends RecursiveFilterIterator
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Checks whether the item is matched by any of the exclude expressions.
-	 * 
+	 *
 	 * @return       boolean true if the items name equals an exclude pattern.
 	 */
 	protected function isExcluded() {
 		return in_array($this->current()->getFilename(), $this->excludes);
 	}
-	
+
 	/**
 	 * Returns a child iterator.
-	 * 
-	 * @return       AgaviRecursiveDirectoryFilterIterator an iterator for a subdirectory
+	 *
+	 * @return       an iterator for a subdirectory
 	 */
-	public function getChildren()
+	public function getChildren(): ?AgaviRecursiveDirectoryFilterIterator
 	{
 		$it = parent::getChildren();
-		if(null !== $it) {
+		if($it instanceof AgaviRecursiveDirectoryFilterIterator) {
 			$it->excludes = $this->excludes;
 			$it->includes = $this->includes;
 		}
 		return $it;
 	}
 }
-
-?>

@@ -50,9 +50,9 @@
 class AgaviMysqlSessionStorage extends AgaviSessionStorage
 {
 	/**
-	 * @var        resource A mysql database resource.
+	 * A mysql database resource.
 	 */
-	protected $resource = null;
+	protected ?\mysqli $resource = null;
 
 	/**
 	 * Initialize this Storage.
@@ -116,7 +116,7 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 	 * @return     bool true, if the session was destroyed, otherwise an
 	 *                  exception is thrown.
 	 *
-	 * @throws     <b>AgaviDatabaseException</b> If the session cannot be 
+	 * @throws     <b>AgaviDatabaseException</b> If the session cannot be
 	 *                                           destroyed.
 	 *
 	 * @author     Sean Kerr <skerr@mojavi.org>
@@ -127,18 +127,18 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 		if(!$this->resource) {
 			return false;
 		}
-		
+
 		// get table/column
 		$db_table  = $this->getParameter('db_table');
 		$db_id_col = $this->getParameter('db_id_col', 'sess_id');
 
 		// cleanup the session id, just in case
-		$id = mysqli_real_escape_string($id, $this->resource);
+		$id = mysqli_real_escape_string($this->resource, $id);
 
 		// delete the record associated with this id
 		$sql = sprintf("DELETE FROM %s WHERE %s = '%s'", $db_table, $db_id_col, $id);
 
-		if(@mysqli_query($sql, $this->resource)) {
+		if(@mysqli_query($this->resource, $sql)) {
 			return true;
 		}
 
@@ -156,7 +156,7 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 	 * @return     bool true, if old sessions have been cleaned, otherwise an
 	 *                  exception is thrown.
 	 *
-	 * @throws     <b>AgaviDatabaseException</b> If old sessions cannot be 
+	 * @throws     <b>AgaviDatabaseException</b> If old sessions cannot be
 	 *                                           cleaned.
 	 *
 	 * @author     Sean Kerr <skerr@mojavi.org>
@@ -167,7 +167,7 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 		if(!$this->resource) {
 			return false;
 		}
-		
+
 		// determine deletable session time
 		$time = time() - $lifetime;
 		$time = date($this->getParameter('date_format', 'U'), $time);
@@ -179,13 +179,13 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 		if(is_numeric($time)) {
 			$time = (int)$time;
 		} else {
-			$time = "'" . mysqli_real_escape_string($time, $this->resource) . "'";
+			$time = "'" . mysqli_real_escape_string($this->resource, $time) . "'";
 		}
 
 		// delete the records that are expired
 		$sql = sprintf('DELETE FROM %s WHERE %s < %s', $db_table, $db_time_col, $time);
 
-		if(@mysqli_query($sql, $this->resource)) {
+		if(@mysqli_query($this->resource, $sql)) {
 			return true;
 		}
 
@@ -240,7 +240,7 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 		if(!$this->resource) {
 			return false;
 		}
-		
+
 		// get table/column
 		$db_table    = $this->getParameter('db_table');
 		$db_data_col = $this->getParameter('db_data_col', 'sess_data');
@@ -248,12 +248,12 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 		$db_time_col = $this->getParameter('db_time_col', 'sess_time');
 
 		// cleanup the session id, just in case
-		$id = mysqli_real_escape_string($id, $this->resource);
+		$id = mysqli_real_escape_string($this->resource, $id);
 
 		// delete the record associated with this id
 		$sql = sprintf("SELECT %s FROM %s WHERE %s = '%s'", $db_data_col, $db_table, $db_id_col, $id);
 
-		$result = @mysqli_query($sql, $this->resource);
+		$result = @mysqli_query($this->resource, $sql);
 
 		if($result != false && mysqli_num_rows($result) > 0) {
 			// found the session
@@ -290,7 +290,7 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 		if(!$this->resource) {
 			return false;
 		}
-		
+
 		// get table/column
 		$db_table    = $this->getParameter('db_table');
 		$db_data_col = $this->getParameter('db_data_col', 'sess_data');
@@ -298,8 +298,8 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 		$db_time_col = $this->getParameter('db_time_col', 'sess_time');
 
 		// cleanup the session id and data, just in case
-		$id   = mysqli_real_escape_string($id, $this->resource);
-		$data = mysqli_real_escape_string($data, $this->resource);
+		$id   = mysqli_real_escape_string($this->resource, $id);
+		$data = mysqli_real_escape_string($this->resource, $data);
 
 		$ts = date($this->getParameter('date_format', 'U'));
 		if(is_numeric($ts)) {
@@ -323,7 +323,7 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 			$db_time_col
 		);
 
-		$result = @mysqli_query($sql, $this->resource);
+		$result = @mysqli_query($this->resource, $sql);
 		if($result !== false) {
 			return true;
 		} else {
@@ -334,5 +334,3 @@ class AgaviMysqlSessionStorage extends AgaviSessionStorage
 		}
 	}
 }
-
-?>

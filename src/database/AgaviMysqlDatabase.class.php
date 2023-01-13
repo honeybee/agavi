@@ -59,7 +59,7 @@ class AgaviMysqlDatabase extends AgaviDatabase
 	public function initialize(AgaviDatabaseManager $databaseManager, array $parameters = array())
 	{
 		parent::initialize($databaseManager, $parameters);
-		
+
 		if($matches = preg_grep('/^\s*SET\s+NAMES\b/i', (array)$this->getParameter('init_queries'))) {
 			throw new AgaviDatabaseException(sprintf('Depending on your MySQL server configuration, it may not be safe to use "SET NAMES" to configure the connection encoding, as the underlying MySQL client library will not be aware of the changed character set. As a result, string escaping may be applied incorrectly, leading to potential attack vectors in combination with certain multi-byte character sets such as GBK or Big5.' . "\n\n" . 'Please remove the "%s" statement from the "init_queries" configuration parameter in databases.xml and use the configuration parameter "charset" instead.' . "\n\n" . 'The associated PHP bug ticket http://bugs.php.net/47802 contains further information (describes PDO, but the basic issue is the same).', $matches[0]));
 		}
@@ -68,7 +68,7 @@ class AgaviMysqlDatabase extends AgaviDatabase
 	/**
 	 * Connect to the database.
 	 *
-	 * @throws     <b>AgaviDatabaseException</b> If a connection could not be 
+	 * @throws     <b>AgaviDatabaseException</b> If a connection could not be
 	 *                                           created.
 	 *
 	 * @author     Sean Kerr <skerr@mojavi.org>
@@ -112,7 +112,7 @@ class AgaviMysqlDatabase extends AgaviDatabase
 
 		// let's see if we need a persistent connection
 		$persistent = $this->getParameter('persistent', false);
-		
+
 		if($password === null) {
 			if($user === null) {
 				$args = array($host, null, null);
@@ -122,13 +122,9 @@ class AgaviMysqlDatabase extends AgaviDatabase
 		} else {
 			$args = array($host, $user, $password);
 		}
-		
-		if($persistent) {
-			$this->connection = call_user_func_array('mysql_pconnect', $args);
-		} else {
-			$this->connection = call_user_func_array('mysql_connect', $args + array(true));
-		}
-		
+
+		$this->connection = call_user_func_array('mysqli_connect', $args + array(true));
+
 		// make sure the connection went through
 		if($this->connection === false) {
 			// the connection's foobar'd
@@ -137,7 +133,7 @@ class AgaviMysqlDatabase extends AgaviDatabase
 		}
 
 		if($this->hasParameter('charset')) {
-			if(!mysql_set_charset($this->getParameter('charset'), $this->connection)) {
+			if(!mysqli_set_charset($this->connection, $this->getParameter('charset'))) {
 				$error = 'Failed to set charset "%s"';
 				$error = sprintf($error, $this->getParameter('charset'));
 				throw new AgaviDatabaseException($error);
@@ -145,7 +141,7 @@ class AgaviMysqlDatabase extends AgaviDatabase
 		}
 
 		// select our database
-		if($database !== null && !@mysql_select_db($database, $this->connection)) {
+		if($database !== null && !@mysqli_select_db($this->connection, $database)) {
 			// can't select the database
 			$error = 'Failed to select AgaviMySQLDatabase "%s"';
 			$error = sprintf($error, $database);
@@ -155,9 +151,9 @@ class AgaviMysqlDatabase extends AgaviDatabase
 		// since we're not an abstraction layer, we copy the connection
 		// to the resource
 		$this->resource =& $this->connection;
-		
+
 		foreach((array)$this->getParameter('init_queries') as $query) {
-			mysql_query($query, $this->connection);
+			mysqli_query($this->connection, $query);
 		}
 	}
 
@@ -198,10 +194,8 @@ class AgaviMysqlDatabase extends AgaviDatabase
 	public function shutdown()
 	{
 		if($this->connection != null) {
-			@mysql_close($this->connection);
+			@mysqli_close($this->connection);
 			$this->connection = $this->resource = null;
 		}
 	}
 }
-
-?>

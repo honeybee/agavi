@@ -13,6 +13,7 @@
 // |   End:                                                                    |
 // +---------------------------------------------------------------------------+
 
+use PHPUnit\TextUI\Command;
 
 /**
  * Main framework class used for running tests on the command line interface.
@@ -26,8 +27,10 @@
  *
  * @since      1.1.0
  */
-class AgaviPhpUnitCli extends PHPUnit_TextUI_Command
+class AgaviPhpUnitCli extends Command
 {
+
+	// protected array $options = [];
 
 	/**
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
@@ -126,7 +129,7 @@ class AgaviPhpUnitCli extends PHPUnit_TextUI_Command
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.1.0
 	 */
-	protected function showHelp()
+	protected function showHelp(): void
 	{
 		parent::showHelp();
 		echo <<<EOT
@@ -160,8 +163,9 @@ EOT;
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.1.0
 	 */
-	protected function handleCustomTestSuite()
+	protected function handleCustomTestSuite(): void
 	{
+		parent::handleCustomTestSuite();
 		// ensure the bootstrap script doesn't run and bootstraps agavi another time
 		define('AGAVI_TESTING_BOOTSTRAPPED', true);
 		AgaviToolkit::clearCache();
@@ -175,11 +179,6 @@ EOT;
 		}
 
 		$this->arguments['configuration'] = $this->expandConfiguration($this->arguments['configuration']);
-
-		if(count($this->options[1]) > 0) {
-			// positional args were given, so the user specified a test or folder on the command line
-			return;
-		}
 
 		$suites = require(AgaviConfigCache::checkConfig(AgaviConfig::get('core.testing_dir') . '/config/suites.xml'));
 

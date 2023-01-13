@@ -13,9 +13,11 @@
 // |   End:                                                                    |
 // +---------------------------------------------------------------------------+
 
+use PHPUnit\Framework\TestSuite;
+
 /**
  * Basic agavi testsuite
- * 
+ *
  * @package    agavi
  * @subpackage testing
  *
@@ -26,8 +28,6 @@
  *
  * @version    $Id$
  */
-class AgaviTestSuite extends PHPUnit_Framework_TestSuite
+class AgaviTestSuite extends TestSuite
 {
 }
-
-?>
