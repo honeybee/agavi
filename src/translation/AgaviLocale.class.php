@@ -94,7 +94,7 @@ class AgaviLocale extends AgaviParameterHolder
 	 * @author     David Zülke <dz@bitxtender.com>
 	 * @since      0.11.0
 	 */
-	public function initialize(AgaviContext $context, array $parameters = array(), $identifier, array $data = array())
+	public function initialize(AgaviContext $context, array $parameters = array(), $identifier = null, array $data = array())
 	{
 		$this->context = $context;
 		$this->parameters = $parameters;
