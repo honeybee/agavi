@@ -35,7 +35,7 @@ class AgaviOptionParser
 	 * @var        array The data from which options are read.
 	 */
 	protected $source = array();
-	
+
 	/**
 	 * @var        array All of the arguments that are passed to the program via
 	 *                   the source.
@@ -43,7 +43,7 @@ class AgaviOptionParser
 	 * @see        AgaviOptionParser::$source
 	 */
 	protected $passedArguments = array();
-	
+
 	/**
 	 * @var        array All of the options that are passed to the program via
 	 *                   the source.
@@ -51,28 +51,30 @@ class AgaviOptionParser
 	 * @see        AgaviOptionParser::$source
 	 */
 	protected $passedOptions = array();
-	
+
+	protected $options = [];
+
 	/**
 	 * @var        string The separator character for long option names.
 	 */
 	protected $nameSeparator = '=';
-	
+
 	/**
 	 * @var        string The characters that must precede each short option name.
 	 */
 	protected $shortNamePrefix = '-';
-	
+
 	/**
 	 * @var        string The characters that must precede each long option name.
 	 */
 	protected $longNamePrefix = '--';
-	
+
 	/**
 	 * @var        string The characters that separate the options from the
 	 *                    program arguments.
 	 */
 	protected $optionTerminator = '--';
-	
+
 	/**
 	 * @var        array Default values for each option.
 	 */
@@ -81,7 +83,7 @@ class AgaviOptionParser
 		'long_names' => array(),
 		'arguments' => 0,
 	);
-	
+
 	/**
 	 * Creates a new option parser.
 	 *
@@ -94,7 +96,7 @@ class AgaviOptionParser
 	{
 		$this->source = $source;
 	}
-	
+
 	/**
 	 * Retrieves the value in the source data that must exist for an option to be
 	 * parsed in its short form.
@@ -110,7 +112,7 @@ class AgaviOptionParser
 	{
 		return $this->shortNamePrefix . $option;
 	}
-	
+
 	/**
 	 * Retrieves the value in the source data that must exist for an option to be
 	 * parsed in its long form.
@@ -126,7 +128,7 @@ class AgaviOptionParser
 	{
 		return $this->longNamePrefix . $option;
 	}
-	
+
 	/**
 	 * Parses the source data and calls callbacks for each option passed in the
 	 * source.
@@ -142,10 +144,10 @@ class AgaviOptionParser
 		foreach($this->options as $option) {
 			$options[] = array_merge($this->defaults, $option);
 		}
-		
+
 		$source = array_values($this->source);
 		$size = count($source);
-		
+
 		for($i = 0; $i < $size; $i++) {
 			if($source[$i] === $this->optionTerminator) {
 				break;
@@ -182,7 +184,7 @@ class AgaviOptionParser
 					}
 				}
 			}
-			
+
 			if($handler === null) {
 				if(strpos($source[$i], $this->shortNamePrefix) === 0 ||
 					strpos($source[$i], $this->longNamePrefix) === 0) {
@@ -201,21 +203,21 @@ class AgaviOptionParser
 				'arguments' => $arguments,
 				'handler' => $handler
 			);
-			
+
 			$i += $increment;
 		}
-		
+
 		for(; $i < $size; $i++) {
 			$this->passedArguments[] = $source[$i];
 		}
-		
+
 		foreach($this->passedOptions as $name => $options) {
 			foreach($options as $option) {
 				call_user_func($option['handler'], $this, $name, $option['arguments'], $this->passedArguments);
 			}
 		}
 	}
-	
+
 	/**
 	 * Retrieves the arguments that have been parsed.
 	 *
@@ -230,7 +232,7 @@ class AgaviOptionParser
 	{
 		return $this->passedArguments;
 	}
-	
+
 	/**
 	 * Determines whether a given argument was passed in the source.
 	 *
@@ -246,7 +248,7 @@ class AgaviOptionParser
 	{
 		return in_array($name, $this->passedArguments);
 	}
-	
+
 	/**
 	 * Retrieves the names of the options that have been parsed.
 	 *
@@ -259,7 +261,7 @@ class AgaviOptionParser
 	{
 		return array_keys($this->passedOptions);
 	}
-	
+
 	/**
 	 * Determines whether a given option was passed in the source.
 	 *
@@ -275,7 +277,7 @@ class AgaviOptionParser
 	{
 		return isset($this->passedOptions[(string)$name]);
 	}
-	
+
 	/**
 	 * Retrieves a given option from the parsed source data.
 	 *
@@ -291,7 +293,7 @@ class AgaviOptionParser
 	{
 		return $this->hasPassedOption($name) ? $this->passedOptions[(string)$name] : null;
 	}
-	
+
 	/**
 	 * Adds a new option to the list of parseable options.
 	 *
@@ -313,7 +315,7 @@ class AgaviOptionParser
 			'arguments' => $arguments
 		);
 	}
-	
+
 	/**
 	 * Retrieves the list of all possible parseable options.
 	 *

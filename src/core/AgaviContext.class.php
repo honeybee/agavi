@@ -15,8 +15,8 @@
 // +---------------------------------------------------------------------------+
 
 /**
- * AgaviContext provides information about the current application context, 
- * such as the module and action names and the module directory. 
+ * AgaviContext provides information about the current application context,
+ * such as the module and action names and the module directory.
  * It also serves as a gateway to the core pieces of the framework, allowing
  * objects with access to the context, to access other useful objects such as
  * the current controller, request, user, database manager etc.
@@ -40,12 +40,12 @@ class AgaviContext
 	 * @var        string The name of the Context.
 	 */
 	protected $name = '';
-	
+
 	/**
 	 * @var        AgaviController A Controller instance.
 	 */
 	protected $controller = null;
-	
+
 	/**
 	 * @var        array An array of class names for frequently used factories.
 	 */
@@ -58,52 +58,52 @@ class AgaviContext
 		'security_filter' => null,
 		'validation_manager' => null,
 	);
-	
+
 	/**
 	 * @var        AgaviDatabaseManager A DatabaseManager instance.
 	 */
 	protected $databaseManager = null;
-	
+
 	/**
 	 * @var        AgaviLoggerManager A LoggerManager instance.
 	 */
 	protected $loggerManager = null;
-	
+
 	/**
 	 * @var        AgaviRequest A Request instance.
 	 */
 	protected $request = null;
-	
+
 	/**
 	 * @var        AgaviRouting A Routing instance.
 	 */
 	protected $routing = null;
-	
+
 	/**
 	 * @var        AgaviStorage A Storage instance.
 	 */
 	protected $storage = null;
-	
+
 	/**
 	 * @var        AgaviTranslationManager A TranslationManager instance.
 	 */
 	protected $translationManager = null;
-	
+
 	/**
 	 * @var        AgaviUser A User instance.
 	 */
 	protected $user = null;
-	
+
 	/**
 	 * @var        array The array used for the shutdown sequence.
 	 */
 	protected $shutdownSequence = array();
-	
+
 	/**
 	 * @var        array An array of AgaviContext instances.
 	 */
 	protected static $instances = array();
-	
+
 	/**
 	 * @var        array An array of SingletonModel instances.
 	 */
@@ -149,7 +149,7 @@ class AgaviContext
 	{
 		return $this->getName();
 	}
-	
+
 	/**
 	 * Get information on a frequently used class.
 	 *
@@ -166,7 +166,7 @@ class AgaviContext
 			return $this->factories[$for];
 		}
 	}
-	
+
 	/**
 	 * Set information on a frequently used class.
 	 *
@@ -199,7 +199,7 @@ class AgaviContext
 		if(null === $info) {
 			throw new AgaviException(sprintf('No factory info for "%s"', $for));
 		}
-		
+
 		$class = new $info['class']();
 		$class->initialize($this, $info['parameters']);
 		return $class;
@@ -230,7 +230,7 @@ class AgaviContext
 	 *
 	 * @return     mixed A database connection.
 	 *
-	 * @throws     <b>AgaviDatabaseException</b> If the requested database name 
+	 * @throws     <b>AgaviDatabaseException</b> If the requested database name
 	 *                                           does not exist.
 	 *
 	 * @author     Sean Kerr <skerr@mojavi.org>
@@ -259,12 +259,12 @@ class AgaviContext
 	/**
 	 * Retrieve the AgaviContext instance.
 	 *
-	 * If you don't supply a profile name this will try to return the context 
+	 * If you don't supply a profile name this will try to return the context
 	 * specified in the <kbd>core.default_context</kbd> setting.
 	 *
 	 * @param      string A name corresponding to a section of the config
 	 *
-	 * @return     AgaviContext An context instance initialized with the 
+	 * @return     AgaviContext An context instance initialized with the
 	 *                          settings of the requested context name
 	 *
 	 * @author     Dominik del Bondio <ddb@bitxtender.com>
@@ -292,11 +292,11 @@ class AgaviContext
 			AgaviException::render($e);
 		}
 	}
-	
+
 	/**
 	 * Retrieve the LoggerManager
 	 *
-	 * @return     AgaviLoggerManager The current LoggerManager implementation 
+	 * @return     AgaviLoggerManager The current LoggerManager implementation
 	 *                                instance.
 	 *
 	 * @author     David Zülke <dz@bitxtender.com>
@@ -322,10 +322,10 @@ class AgaviContext
 		} catch(Exception $e) {
 			AgaviException::render($e, $this);
 		}
-		
+
 		register_shutdown_function(array($this, 'shutdown'));
 	}
-	
+
 	/**
 	 * Shut down this AgaviContext and all related factories.
 	 *
@@ -338,7 +338,7 @@ class AgaviContext
 			$object->shutdown();
 		}
 	}
-	
+
 	/**
 	 * Retrieve a Model implementation instance.
 	 *
@@ -362,7 +362,7 @@ class AgaviContext
 		$class = str_replace('/', '_', $modelName) . 'Model';
 		$file = null;
 		$rc = null;
-		
+
 		if($moduleName === null) {
 			// global model
 			// let's try to autoload that baby
@@ -374,7 +374,7 @@ class AgaviContext
 			try {
 				$this->controller->initializeModule($moduleName);
 			} catch(AgaviDisabledModuleException $e) {
-				// swallow, this will load the modules autoload but throw an exception 
+				// swallow, this will load the modules autoload but throw an exception
 				// if the module is disabled.
 			}
 			// module model
@@ -392,44 +392,43 @@ class AgaviContext
 		}
 
 		if(!class_exists($class)) {
-			// it's not there. 
+			// it's not there.
 			throw new AgaviAutoloadException(sprintf("Couldn't find class for Model %s", $origModelName));
 		}
-		
+
 		// so if we're here, we found something, right? good.
-		
+
 		$rc = new ReflectionClass($class);
-		
+		$cf = $rc->getConstructor();
+
 		if($rc->implementsInterface('AgaviISingletonModel')) {
 			// it's a singleton
 			if(!isset($this->singletonModelInstances[$class])) {
 				// no instance yet, so we create one
-				
-				if($parameters === null || $rc->getConstructor() === null) {
+				if ($parameters === null || $cf === null || count($cf->getParameters()) === 0) {
 					// it has an initialize() method, or no parameters were given, so we don't hand arguments to the constructor
 					$this->singletonModelInstances[$class] = new $class();
 				} else {
 					// we use this approach so we can pass constructor params or if it doesn't have an initialize() method
-					$this->singletonModelInstances[$class] = $rc->newInstanceArgs($parameters);
+					$this->singletonModelInstances[$class] = $rc->newInstanceArgs(array_values($parameters));
 				}
 			}
 			$model = $this->singletonModelInstances[$class];
 		} else {
 			// create an instance
-			if($parameters === null || $rc->getConstructor() === null) {
+			if ($parameters === null || $cf === null || count($cf->getParameters()) === 0) {
 				// it has an initialize() method, or no parameters were given, so we don't hand arguments to the constructor
 				$model = new $class();
 			} else {
-				// we use this approach so we can pass constructor params or if it doesn't have an initialize() method
-				$model = $rc->newInstanceArgs($parameters);
+				$model = $rc->newInstanceArgs(array_values($parameters));
 			}
 		}
-		
+
 		if(is_callable(array($model, 'initialize'))) {
 			// pass the constructor params again. dual use for the win
 			$model->initialize($this, (array) $parameters);
 		}
-		
+
 		return $model;
 	}
 
@@ -445,7 +444,7 @@ class AgaviContext
 	{
 		return $this->name;
 	}
-	
+
 	/**
 	 * Retrieve the request.
 	 *
