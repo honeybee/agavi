@@ -501,6 +501,7 @@ class AgaviXmlConfigParser
 		// we can't foreach() over the DOMNodeList as we're modifying it further below
 		// see http://php.net/manual/en/class.domnodelist.php#83178
 		for($i = 0; $i < $length; $i++) {
+			/** @var $element DOMNode|null */
 			$element = $elements->item($i);
 			if($element->hasAttribute('href')) {
 				$attribute = $element->getAttributeNode('href');
@@ -675,10 +676,12 @@ class AgaviXmlConfigParser
 			// yes! alright. trick: we create a doc fragment with the contents so we don't have to parse things by hand...
 			$fragment = $document->createDocumentFragment();
 			$fragment->appendXml('<foo ' . $pi->data . ' />');
-			$type = $fragment->firstChild->getAttribute('type');
+			/** @var $fragment->firstChild DOMNode|null */
+			$firstChild = $fragment->firstChild;
+			$type = $firstChild->getAttribute('type');
 			// we process only the types below...
 			if(in_array($type, array('text/xml', 'text/xsl', 'application/xml', 'application/xsl+xml'))) {
-				$href = $href = $fragment->firstChild->getAttribute('href');
+				$href = $href = $firstChild->getAttribute('href');
 
 				if(strpos($href, '#') === 0) {
 					// the href points to an embedded XSL stylesheet (with ID reference), so let's see if we can find it
