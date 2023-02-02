@@ -274,7 +274,7 @@ class AgaviXmlConfigDomDocument extends DOMDocument
 	 * @author     Noah Fontes <noah.fontes@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function schemaValidate(string $filename, int $flags = 0): bool
+	public function schemaValidate($filename, $flags = 0): bool
 	{
 		$luie = libxml_use_internal_errors(true);
 		libxml_clear_errors();
@@ -312,7 +312,7 @@ class AgaviXmlConfigDomDocument extends DOMDocument
 	 * @author     Noah Fontes <noah.fontes@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function schemaValidateSource(string $source, int $flags = 0): bool
+	public function schemaValidateSource($source, $flags = 0): bool
 	{
 		$luie = libxml_use_internal_errors(true);
 		libxml_clear_errors();
