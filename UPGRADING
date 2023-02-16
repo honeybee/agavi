@@ -1,6 +1,11 @@
 AGAVI UPGRADING INSTRUCTIONS
 ============================
 
+Upgrading to 1.2 Series from 1.0 Series
+=======================================
+Your project shouldn't need too much adaptation. There are some breaking changes from PHP8 (included different signatures on DomDocument, that you might need to fix in extended classes; see relative commits).  
+Also the Twig rendering needs to be adapted (for help check the Twig documentation).
+
 Upgrading to 1.1 Series from 1.0 Series
 =======================================
 
