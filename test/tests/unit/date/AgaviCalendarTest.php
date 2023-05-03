@@ -179,7 +179,7 @@ class AgaviCalendarTest extends BaseCalendarTest
 					$this->assertFalse($cal->_isSet($i), 'AgaviCalendar::isSet = T, should be F  ' . $this->fieldName($i));
 			}
 			$cal->clear($i);
-			$this->assertFalse($cal->_isSet($i), 'AgaviCalendar::clear/isSet failed ' + $this->fieldName($i));
+			$this->assertFalse($cal->_isSet($i), 'AgaviCalendar::clear/isSet failed ' . $this->fieldName($i));
 		}
 
 		return;
