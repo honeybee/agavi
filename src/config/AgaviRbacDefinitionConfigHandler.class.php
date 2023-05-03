@@ -30,8 +30,8 @@
  */
 class AgaviRbacDefinitionConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/rbac_definitions/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/rbac_definitions/1.0';
+
 	/**
 	 * Execute this configuration handler.
 	 *
@@ -52,22 +52,22 @@ class AgaviRbacDefinitionConfigHandler extends AgaviXmlConfigHandler
 	{
 		// set up our default namespace
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'rbac_definitions');
-		
+
 		$data = array();
 
 		foreach($document->getConfigurationElements() as $cfg) {
 			if(!$cfg->has('roles')) {
 				continue;
 			}
-			
+
 			$this->parseRoles($cfg->get('roles'), null, $data);
 		}
 
 		$code = "return " . var_export($data, true) . ";";
-		
+
 		return $this->generate($code, $document->documentURI);
 	}
-	
+
 	/**
 	 * Parse a 'roles' node.
 	 *

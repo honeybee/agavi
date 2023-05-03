@@ -44,7 +44,7 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 	{
 		return $this->getValue();
 	}
-	
+
 	/**
 	 * Returns the element name.
 	 *
@@ -59,7 +59,7 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 		// but... element name, or with ns prefix?
 		return $this->nodeName;
 	}
-	
+
 	/**
 	 * Returns the element value.
 	 *
@@ -75,7 +75,7 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 		// I'd really say we only support utf-8 for the new api
 		return $this->nodeValue;
 	}
-	
+
 	/**
 	 * Returns the literal value. By default, that means whitespace is trimmed,
 	 * boolean literals ("on", "yes", "true", "no", "off", "false") are converted
@@ -85,7 +85,7 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 	 * {http://agavi.org/agavi/config/global/envelope/1.1}literalize into account
 	 * when computing the literal value. This way, users can control the trimming
 	 * and the literalization of values.
-	 * 
+	 *
 	 * AEP-100 has a list of all the conversion rules that apply.
 	 *
 	 * @return     mixed The element content converted according to the rules
@@ -101,10 +101,10 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 		// trim strips more than that
 		// no problem though, because these other chars aren't legal in XML
 		$trimmedValue = trim($value);
-		
+
 		$preserveWhitespace = $this->getAttributeNS(AgaviXmlConfigParser::NAMESPACE_XML_1998, 'space') == 'preserve';
 		$literalize = AgaviToolkit::literalize($this->getAttributeNS(AgaviXmlConfigParser::NAMESPACE_AGAVI_ENVELOPE_LATEST, 'literalize')) !== false;
-		
+
 		if($literalize) {
 			if($preserveWhitespace && ($trimmedValue === '' || $value != $trimmedValue)) {
 				// we must preserve whitespace, and there is leading or trailing whitespace in the original value, so we won't run AgaviToolkit::literalize(), which trims the input and then converts "true" to a boolean and so forth
@@ -121,10 +121,10 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 				$value = null;
 			}
 		}
-		
+
 		return $value;
 	}
-	
+
 	/**
 	 * Returns an iterator for the child nodes.
 	 *
@@ -143,7 +143,7 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 			return $this->ownerDocument->getXpath()->query('child::*', $this);
 		}
 	}
-	
+
 	/**
 	 * Retrieve singular form of given element name.
 	 * This does special splitting only of the last part of the name if the name
@@ -163,7 +163,7 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 		$names[count($names) - 1] = AgaviInflector::singularize(end($names));
 		return implode('', $names);
 	}
-	
+
 	/**
 	 * Convenience method to retrieve child elements of the given name.
 	 * Accepts singular or plural forms of the name, and will detect and handle
@@ -183,7 +183,7 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 	{
 		return $this->getChildren($name, $namespaceUri, true);
 	}
-	
+
 	/**
 	 * Convenience method to check if there are child elements of the given name.
 	 * Accepts singular or plural forms of the name, and will detect and handle
@@ -204,7 +204,7 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 	{
 		return $this->hasChildren($name, $namespaceUri, true);
 	}
-	
+
 	/**
 	 * Count the number of child elements with a given name.
 	 *
@@ -226,16 +226,16 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 		// if arg is null, then only check for elements from our default namespace
 		// if namespace uri is null, use default ns. if empty string, use no ns
 		$namespaceUri = ($namespaceUri === null ? $this->ownerDocument->getDefaultNamespaceUri() : $namespaceUri);
-		
+
 		// init our vars
 		$query = '';
 		$singularName = null;
-		
+
 		// tag our element, because older libxmls will mess things up otherwise
 		// http://trac.agavi.org/ticket/1039
 		$marker = uniqid('', true);
 		$this->setAttributeNS(AgaviXmlConfigParser::NAMESPACE_AGAVI_ANNOTATIONS_LATEST, 'agavi_annotations_latest:marker', $marker);
-		
+
 		if($pluralMagic) {
 			// we always assume that we either get plural names, or the singular of the singular is not different from the singular :)
 			$singularName = $this->singularize($name);
@@ -251,14 +251,14 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 				$query = 'count(%1$s[../@agavi_annotations_latest:marker = "%4$s"])';
 			}
 		}
-		
+
 		$retval = (int)$this->ownerDocument->getXpath()->evaluate(sprintf($query, $name, $singularName, $namespaceUri, $marker), $this);
-		
+
 		$this->removeAttributeNS(AgaviXmlConfigParser::NAMESPACE_AGAVI_ANNOTATIONS_LATEST, 'agavi_annotations_latest:marker');
-		
+
 		return $retval;
 	}
-	
+
 	/**
 	 * Determine whether there is at least one instance of a child element with a
 	 * given name.
@@ -281,7 +281,7 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 	{
 		return $this->countChildren($name, $namespaceUri, $pluralMagic) !== 0;
 	}
-	
+
 	/**
 	 * Retrieve all children with the given element name.
 	 *
@@ -303,15 +303,15 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 		// if arg is null, then only check for elements from our default namespace
 		// if namespace uri is null, use default ns. if empty string, use no ns
 		$namespaceUri = ($namespaceUri === null ? $this->ownerDocument->getDefaultNamespaceUri() : $namespaceUri);
-		
+
 		// init our vars
 		$query = '';
 		$singularName = null;
-		
+
 		// tag our element, because libxml will mess things up otherwise
 		$marker = uniqid('', true);
 		$this->setAttributeNS(AgaviXmlConfigParser::NAMESPACE_AGAVI_ANNOTATIONS_LATEST, 'agavi_annotations_latest:marker', $marker);
-		
+
 		if($pluralMagic) {
 			// we always assume that we either get plural names, or the singular of the singular is not different from the singular :)
 			$singularName = $this->singularize($name);
@@ -327,14 +327,14 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 				$query = '%1$s[../@agavi_annotations_latest:marker = "%4$s"]';
 			}
 		}
-		
+
 		$retval = $this->ownerDocument->getXpath()->query(sprintf($query, $name, $singularName, $namespaceUri, $marker), $this);
-		
+
 		$this->removeAttributeNS(AgaviXmlConfigParser::NAMESPACE_AGAVI_ANNOTATIONS_LATEST, 'agavi_annotations_latest:marker');
-		
+
 		return $retval;
 	}
-	
+
 	/**
 	 * Determine whether this element has a particular child element. This method
 	 * succeeds only when there is exactly one child element with the given name.
@@ -355,7 +355,7 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 	{
 		return $this->getChild($name, $namespaceUri) !== null;
 	}
-	
+
 	/**
 	 * Return a single child element with a given name.
 	 * Only returns anything if there is exactly one child of this name.
@@ -376,24 +376,24 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 		// if arg is null, then only check for elements from our default namespace
 		// if namespace uri is null, use default ns. if empty string, use no ns
 		$namespaceUri = ($namespaceUri === null ? $this->ownerDocument->getDefaultNamespaceUri() : $namespaceUri);
-		
+
 		// tag our element, because libxml will mess things up otherwise
 		$marker = uniqid('', true);
 		$this->setAttributeNS(AgaviXmlConfigParser::NAMESPACE_AGAVI_ANNOTATIONS_LATEST, 'agavi_annotations_latest:marker', $marker);
-		
+
 		if($namespaceUri) {
 			$query = 'self::node()[count(child::*[local-name() = "%1$s" and namespace-uri() = "%2$s" and ../@agavi_annotations_latest:marker = "%3$s"]) = 1]/*[local-name() = "%1$s" and namespace-uri() = "%2$s" and ../@agavi_annotations_latest:marker = "%3$s"]';
 		} else {
 			$query = 'self::node()[count(child::%1$s[../@agavi_annotations_latest:marker = "%3$s"]) = 1]/%1$s[../@agavi_annotations_latest:marker = "%3$s"]';
 		}
-		
+
 		$retval = $this->ownerDocument->getXpath()->query(sprintf($query, $name, $namespaceUri, $marker), $this)->item(0);
-		
+
 		$this->removeAttributeNS(AgaviXmlConfigParser::NAMESPACE_AGAVI_ANNOTATIONS_LATEST, 'agavi_annotations_latest:marker');
-		
+
 		return $retval;
 	}
-	
+
 	/**
 	 * Retrieve an attribute value.
 	 * Unlike DOMElement::getAttribute(), this method accepts an optional default
@@ -413,16 +413,16 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 	public function getAttribute($name, $default = null)
 	{
 		$retval = parent::getAttribute($name);
-		
+
 		// getAttribute returns '' when the attribute doesn't exist, but any
 		// null-ish value is probably unacceptable anyway
 		if($retval == null) {
 			$retval = $default;
 		}
-		
+
 		return $retval;
 	}
-	
+
 	/**
 	 * Retrieve a namespaced attribute value.
 	 * Unlike DOMElement::getAttributeNS(), this method accepts an optional
@@ -443,14 +443,14 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 	public function getAttributeNS($namespaceUri, $localName, $default = null)
 	{
 		$retval = parent::getAttributeNS($namespaceUri, $localName);
-		
+
 		if($retval === null) {
 			$retval = $default;
 		}
-		
+
 		return $retval;
 	}
-	
+
 	/**
 	 * Retrieve all attributes of the element that are in no namespace.
 	 *
@@ -463,7 +463,7 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 	{
 		return $this->getAttributesNS('');
 	}
-	
+
 	/**
 	 * Retrieve all attributes of the element that are in the given namespace.
 	 *
@@ -475,14 +475,14 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 	public function getAttributesNS($namespaceUri)
 	{
 		$retval = array();
-		
+
 		foreach($this->ownerDocument->getXpath()->query(sprintf('@*[namespace-uri() = "%s"]', $namespaceUri), $this) as $attribute) {
 			$retval[$attribute->localName] = $attribute->nodeValue;
 		}
-		
+
 		return $retval;
 	}
-	
+
 	/**
 	 * Check whether or not the element has Agavi parameters as children.
 	 *
@@ -496,10 +496,10 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 		if($this->ownerDocument->isAgaviConfiguration()) {
 			return $this->has('parameters', AgaviXmlConfigParser::NAMESPACE_AGAVI_ENVELOPE_LATEST);
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Retrieve all of the Agavi parameter elements associated with this
 	 * element.
@@ -516,10 +516,10 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 	{
 		$result = $existing;
 		$offset = 0;
-		
+
 		if($this->ownerDocument->isAgaviConfiguration()) {
 			$elements = $this->get('parameters', AgaviXmlConfigParser::NAMESPACE_AGAVI_ENVELOPE_LATEST);
-			
+
 			foreach($elements as $element) {
 				$key = null;
 				if(!$element->hasAttribute('name')) {
@@ -527,7 +527,7 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 				} else {
 					$key = $element->getAttribute('name');
 				}
-				
+
 				if($element->hasAgaviParameters()) {
 					$result[$key] = isset($result[$key]) && is_array($result[$key]) ? $result[$key] : array();
 					$result[$key] = $element->getAgaviParameters($result[$key]);
@@ -536,7 +536,60 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 				}
 			}
 		}
-		
+
+		return $result;
+	}
+
+	/**
+	 * Check whether or not the element has Agavi errors as children.
+	 *
+	 * @return     bool True, if there are errors, false otherwise.
+	 *
+	 * @author     Jan Schütze <JanS@DracoBlue.de>
+	 * @author     Steffen Gransow <agavi@mivesto.de>
+	 *
+	 * @since      1.0.8
+	 */
+	public function hasAgaviErrors()
+	{
+		if($this->ownerDocument->isAgaviConfiguration()) {
+			return $this->has('errors', AgaviValidatorConfigHandler::XML_NAMESPACE);
+		}
+
+		return false;
+	}
+
+	/**
+	 * Retrieve all of the Agavi error elements associated with this
+	 * element.
+	 *
+	 * @param      array An array of existing errors.
+	 *
+	 * @return     array The complete array of errors.
+	 *
+	 * @author     Jan Schütze <JanS@DracoBlue.de>
+	 * @author     Steffen Gransow <agavi@mivesto.de>
+	 *
+	 * @since      1.0.8
+	 */
+	public function getAgaviErrors(array $existing = array())
+	{
+		$result = $existing;
+		$offset = 0;
+
+		if($this->ownerDocument->isAgaviConfiguration()) {
+			$elements = $this->get('errors', AgaviValidatorConfigHandler::XML_NAMESPACE);
+
+			foreach($elements as $element) {
+				$key = '';
+				if($element->hasAttribute('for')) {
+					$key = $element->getAttribute('for');
+				}
+
+				$result[$key] = $element->getValue();
+			}
+		}
+
 		return $result;
 	}
 }

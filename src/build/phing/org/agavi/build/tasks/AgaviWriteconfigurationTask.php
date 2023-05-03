@@ -35,7 +35,7 @@ class AgaviWriteconfigurationTask extends AgaviTask
 	protected $path = null;
 	protected $value = null;
 	protected $namespace = null;
-	
+
 	/**
 	 * Sets the file to modify.
 	 *
@@ -45,7 +45,7 @@ class AgaviWriteconfigurationTask extends AgaviTask
 	{
 		$this->file = $file;
 	}
-	
+
 	/**
 	 * Sets the XPath path to search for in the file.
 	 *
@@ -55,7 +55,7 @@ class AgaviWriteconfigurationTask extends AgaviTask
 	{
 		$this->path = $path;
 	}
-	
+
 	/**
 	 * Sets the new value for the configuration element.
 	 *
@@ -74,7 +74,7 @@ class AgaviWriteconfigurationTask extends AgaviTask
 	public function setNamespace($namespace) {
 		$this->namespace = $namespace;
 	}
-	
+
 	/**
 	 * Executes this task.
 	 */
@@ -89,11 +89,11 @@ class AgaviWriteconfigurationTask extends AgaviTask
 		if($this->value === null) {
 			throw new BuildException('The value attribute must be specified');
 		}
-		
+
 		$document = new DOMDocument();
 		$document->preserveWhiteSpace = true;
 		$document->load($this->file->getAbsolutePath());
-		
+
 		$path = new DOMXPath($document);
 		$path->registerNamespace('envelope', 'http://agavi.org/agavi/config/global/envelope/1.0');
 		$path->registerNamespace('envelope10', 'http://agavi.org/agavi/config/global/envelope/1.0');
@@ -101,14 +101,14 @@ class AgaviWriteconfigurationTask extends AgaviTask
 		if($this->namespace !== null) {
 			$path->registerNamespace('document', $this->namespace);
 		}
-		
+
 		$entries = $path->query($this->path);
 		foreach($entries as $entry) {
 			$entry->nodeValue = (string)$this->value;
 		}
-		
+
 		$document->save($this->file->getAbsolutePath());
-		
+
 		$this->log(sprintf('Writing configuration file %s with new data for %s (%s)',
 			$this->file->getAbsolutePath(), $this->path, $this->value), Project::MSG_INFO);
 	}

@@ -30,8 +30,8 @@
  */
 class AgaviCachingConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/caching/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/caching/1.0';
+
 	/**
 	 * Execute this configuration handler.
 	 *
@@ -52,14 +52,14 @@ class AgaviCachingConfigHandler extends AgaviXmlConfigHandler
 	{
 		// set up our default namespace
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'caching');
-		
+
 		$cachings = array();
-		
+
 		foreach($document->getConfigurationElements() as $cfg) {
 			if(!$cfg->has('cachings')) {
 				continue;
 			}
-			
+
 			foreach($cfg->get('cachings') as $caching) {
 				$groups = array();
 				if($caching->has('groups')) {
@@ -67,14 +67,14 @@ class AgaviCachingConfigHandler extends AgaviXmlConfigHandler
 						$groups[] = array('name' => $group->getValue(), 'source' => $group->getAttribute('source', 'string'), 'namespace' => $group->getAttribute('namespace')) ;
 					}
 				}
-				
+
 				$actionAttributes = array();
 				if($caching->has('action_attributes')) {
 					foreach($caching->get('action_attributes') as $actionAttribute) {
 						$actionAttributes[] = $actionAttribute->getValue();
 					}
 				}
-				
+
 				$views = null;
 				if($caching->has('views')) {
 					$views = array();
@@ -86,7 +86,7 @@ class AgaviCachingConfigHandler extends AgaviXmlConfigHandler
 						}
 					}
 				}
-				
+
 				$outputTypes = array();
 				if($caching->has('output_types')) {
 					foreach($caching->get('output_types') as $outputType) {
@@ -108,28 +108,28 @@ class AgaviCachingConfigHandler extends AgaviXmlConfigHandler
 								}
 							}
 						}
-						
+
 						$templateVariables = array();
 						if($outputType->has('template_variables')) {
 							foreach($outputType->get('template_variables') as $templateVariable) {
 								$templateVariables[] = $templateVariable->getValue();
 							}
 						}
-						
+
 						$requestAttributes = array();
 						if($outputType->has('request_attributes')) {
 							foreach($outputType->get('request_attributes') as $requestAttribute) {
 								$requestAttributes[] = array('name' => $requestAttribute->getValue(), 'namespace' => $requestAttribute->getAttribute('namespace'));
 							}
 						}
-						
+
 						$requestAttributeNamespaces = array();
 						if($outputType->has('request_attribute_namespaces')) {
 							foreach($outputType->get('request_attribute_namespaces') as $requestAttributeNamespace) {
 								$requestAttributeNamespaces[] = $requestAttributeNamespace->getValue();
 							}
 						}
-						
+
 						$otnames = array_map('trim', explode(' ', $outputType->getAttribute('name', '*')));
 						foreach($otnames as $otname) {
 							$outputTypes[$otname] = array(
@@ -141,7 +141,7 @@ class AgaviCachingConfigHandler extends AgaviXmlConfigHandler
 						}
 					}
 				}
-				
+
 				$methods = array_map('trim', explode(' ', $caching->getAttribute('method', '*')));
 				foreach($methods as $method) {
 					if(!AgaviToolkit::literalize($caching->getAttribute('enabled', true))) {
@@ -159,7 +159,7 @@ class AgaviCachingConfigHandler extends AgaviXmlConfigHandler
 				}
 			}
 		}
-		
+
 		$code = array(
 			'$configs = ' . var_export($cachings, true) . ';',
 			'if(isset($configs[$index = $container->getRequestMethod()]) || isset($configs[$index = "*"])) {',
@@ -191,7 +191,7 @@ class AgaviCachingConfigHandler extends AgaviXmlConfigHandler
 			'	}',
 			'}',
 		);
-		
+
 		return $this->generate($code, $document->documentURI);
 	}
 }

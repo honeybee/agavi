@@ -100,7 +100,7 @@ class AgaviXmlConfigDomDocument extends DOMDocument
 	 * @author     Noah Fontes <noah.fontes@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function load($filename, $options = 0)
+	public function load($filename, $options = null)
 	{
 		$luie = libxml_use_internal_errors(true);
 		libxml_clear_errors();
@@ -145,7 +145,7 @@ class AgaviXmlConfigDomDocument extends DOMDocument
 	 * @author     Noah Fontes <noah.fontes@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function loadXml($source, $options = 0)
+	public function loadXml($source, $options = null)
 	{
 		$luie = libxml_use_internal_errors(true);
 		libxml_clear_errors();
@@ -189,7 +189,7 @@ class AgaviXmlConfigDomDocument extends DOMDocument
 	 * @author     Noah Fontes <noah.fontes@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function xinclude($options = 0)
+	public function xinclude($options = null)
 	{
 		$luie = libxml_use_internal_errors(true);
 		libxml_clear_errors();
@@ -235,7 +235,7 @@ class AgaviXmlConfigDomDocument extends DOMDocument
 	 * @author     Noah Fontes <noah.fontes@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function importNode(DOMNode $node, $deep)
+	public function importNode(DOMNode $node, $deep = null)
 	{
 		$luie = libxml_use_internal_errors(true);
 		libxml_clear_errors();
@@ -274,7 +274,7 @@ class AgaviXmlConfigDomDocument extends DOMDocument
 	 * @author     Noah Fontes <noah.fontes@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function schemaValidate($filename)
+	public function schemaValidate($filename): bool
 	{
 		$luie = libxml_use_internal_errors(true);
 		libxml_clear_errors();
@@ -312,7 +312,7 @@ class AgaviXmlConfigDomDocument extends DOMDocument
 	 * @author     Noah Fontes <noah.fontes@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function schemaValidateSource($source)
+	public function schemaValidateSource($source): bool
 	{
 		$luie = libxml_use_internal_errors(true);
 		libxml_clear_errors();

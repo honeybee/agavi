@@ -15,10 +15,11 @@
 
 /**
  * AgaviANDOperatorValidator only succeeds if all sub-validators succeeded
- * 
+ *
  * Parameters:
  *   'skip_errors' do not submit errors of child validators to validator manager
  *   'break'       break the execution of child validators after first failure
+ *   'min_fail_severity' minimum child validator severity level to fail on
  *
  * @package    agavi
  * @subpackage validator
@@ -36,9 +37,9 @@ class AgaviAndoperatorValidator extends AgaviOperatorValidator
 {
 	/**
 	 * Validates the operator by executing the child validators.
-	 * 
+	 *
 	 * @return     bool True if all child validators resulted successful.
-	 * 
+	 *
 	 * @author     Dominik del Bondio <ddb@bitxtender.com>
 	 * @author     Uwe Mesecke <uwe@mesecke.net>
 	 * @since      0.11.0
@@ -46,11 +47,16 @@ class AgaviAndoperatorValidator extends AgaviOperatorValidator
 	protected function validate()
 	{
 		$return = true;
-		
+
+		$min_fail_severity = $this->getParameter('min_fail_severity', AgaviValidator::INFO);
+		if(strpos($min_fail_severity, '::') && defined($min_fail_severity)) {
+			$min_fail_severity = constant($min_fail_severity);
+		}
+
 		foreach($this->children as $child) {
 			$result = $child->execute($this->validationParameters);
 			$this->result = max($result, $this->result);
-			if($result > AgaviValidator::SUCCESS) {
+			if($result >= $min_fail_severity) {
 				// if one validator fails, the whole operator fails
 				$return = false;
 				$this->throwError();
@@ -59,9 +65,9 @@ class AgaviAndoperatorValidator extends AgaviOperatorValidator
 				}
 			}
 		}
-		
+
 		return $return;
-	}	
+	}
 }
 
 ?>

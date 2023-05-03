@@ -31,8 +31,8 @@
  */
 class AgaviTranslationConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/translation/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/translation/1.0';
+
 	/**
 	 * Execute this configuration handler.
 	 *
@@ -51,9 +51,9 @@ class AgaviTranslationConfigHandler extends AgaviXmlConfigHandler
 	{
 		// set up our default namespace
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'translation');
-		
+
 		$config = $document->documentURI;
-		
+
 		$translatorData = array();
 		$localeData = array();
 
@@ -115,7 +115,7 @@ class AgaviTranslationConfigHandler extends AgaviXmlConfigHandler
 
 		return $this->generate($data, $config);
 	}
-	
+
 	/**
 	 * Builds a list of filters for a translator.
 	 *
@@ -185,7 +185,7 @@ class AgaviTranslationConfigHandler extends AgaviXmlConfigHandler
 					if(!isset($domainData[$type])) {
 						$domainData[$type] = $defaultData[$type];
 					}
-					
+
 					if($node->hasAttribute('translation_domain')) {
 						$domainData[$type]['params']['translation_domain'] = $node->getAttribute('translation_domain');
 					}

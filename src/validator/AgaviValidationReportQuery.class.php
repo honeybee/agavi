@@ -59,7 +59,7 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 	 * @var        array|int
 	 */
 	protected $maxSeverityFilter;
-	
+
 	/**
 	 * Constructor.
 	 * 
@@ -182,6 +182,21 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 		$obj->maxSeverityFilter = $maxSeverity;
 		return $obj;
 	}
+
+	/**
+	 * Check whether the given depend token was provided by the validation run.
+	 *
+	 * @param      string Name of depend token suspected to have been provided.
+	 *
+	 * @return     bool true if depend token was provided.
+	 *
+	 * @author     Steffen Gransow <agavi@mivesto.de>
+	 * @since      1.0.8
+	 */
+	public function hasDependToken($name)
+	{
+        return array_key_exists($name, $this->report->getDependTokens());
+	}
 	
 	/**
 	 * Retrieves the incidents filtered with the current filter rules.
@@ -298,6 +313,19 @@ class AgaviValidationReportQuery implements AgaviIValidationReportQuery
 			$errorMessages[] = $error->getMessage();
 		}
 		return $errorMessages;
+	}
+
+	/**
+	 * Retrieves all depend tokens provided by the validation run.
+	 *
+	 * @return     array An array of provided depend tokens.
+	 *
+	 * @author     Steffen Gransow <agavi@mivesto.de>
+	 * @since      1.0.8
+	 */
+	public function getDependTokens()
+	{
+		return $this->report->getDependTokens();
 	}
 	
 	/**

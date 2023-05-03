@@ -33,10 +33,10 @@ class AgaviDependencyManager
 	 * @var array already provided tokens.
 	 */
 	protected $depData = array();
-	
+
 	/**
 	 * Clears the dependency cache.
-	 * 
+	 *
 	 * @author     Uwe Mesecke <uwe@mesecke.net>
 	 * @since      0.11.0
 	 */
@@ -44,16 +44,16 @@ class AgaviDependencyManager
 	{
 		$this->depData = array();
 	}
-	
+
 	/**
 	 * Checks whether a list of dependencies is met.
-	 * 
+	 *
 	 * @param      array  The list of dependencies that have to meet.
-	 * @param      AgaviVirtualArrayPath The base path to which all tokens are 
+	 * @param      AgaviVirtualArrayPath The base path to which all tokens are
 	 *                                   appended.
-	 * 
+	 *
 	 * @return     bool all dependencies are met
-	 * 
+	 *
 	 * @author     Uwe Mesecke <uwe@mesecke.net>
 	 * @since      0.11.0
 	 */
@@ -61,27 +61,27 @@ class AgaviDependencyManager
 	{
 		$currentParts = $base->getParts();
 		foreach($tokens as $token) {
-			if($currentParts && strpos($token, '%') !== false) { 
-				// the depends attribute contains sprintf syntax 
-				$token = vsprintf($token, $currentParts); 
+			if($currentParts && strpos($token, '%') !== false) {
+				// the depends attribute contains sprintf syntax
+				$token = vsprintf($token, $currentParts);
 			}
-			
+
 			$path = new AgaviVirtualArrayPath($token);
 			if(!$path->getValue($this->depData)) {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Puts a list of tokens into the dependency cache.
-	 * 
+	 *
 	 * @param      array  The list of new tokens.
-	 * @param      AgaviVirtualArrayPath The base path to which all tokens are 
+	 * @param      AgaviVirtualArrayPath The base path to which all tokens are
 	 *                                   appended.
-	 * 
+	 *
 	 * @author     Uwe Mesecke <uwe@mesecke.net>
 	 * @since      0.11.0
 	 */
@@ -89,16 +89,16 @@ class AgaviDependencyManager
 	{
 		$currentParts = $base->getParts();
 		foreach($tokens as $token) {
-			if($currentParts && strpos($token, '%') !== false) { 
-				// the depends attribute contains sprintf syntax 
-				$token = vsprintf($token, $currentParts); 
+			if($currentParts && strpos($token, '%') !== false) {
+				// the depends attribute contains sprintf syntax
+				$token = vsprintf($token, $currentParts);
 			}
-			
+
 			$path = new AgaviVirtualArrayPath($token);
 			$path->setValue($this->depData, true);
 		}
 	}
-	
+
 	/**
 	 * Populate key references in an argument base string if necessary.
 	 * Fills only empty bracket positions with an sprintf() offset placeholder.
@@ -125,7 +125,7 @@ class AgaviDependencyManager
 			$string
 		);
 	}
-	
+
 	/*
 	 * Returns the list of provided tokens from the dependency cache.
 	 *

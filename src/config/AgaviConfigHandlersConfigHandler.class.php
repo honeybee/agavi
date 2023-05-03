@@ -33,8 +33,8 @@
  */
 class AgaviConfigHandlersConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/config_handlers/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/config_handlers/1.0';
+
 	/**
 	 * Execute this configuration handler.
 	 *
@@ -57,23 +57,23 @@ class AgaviConfigHandlersConfigHandler extends AgaviXmlConfigHandler
 	{
 		// set up our default namespace
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'config_handlers');
-		
+
 		// init our data arrays
 		$handlers = array();
-		
+
 		foreach($document->getConfigurationElements() as $configuration) {
 			if(!$configuration->has('handlers')) {
 				continue;
 			}
-			
+
 			// let's do our fancy work
 			foreach($configuration->get('handlers') as $handler) {
 				$pattern = $handler->getAttribute('pattern');
-				
+
 				$category = AgaviToolkit::normalizePath(AgaviToolkit::expandDirectives($pattern));
-				
+
 				$class = $handler->getAttribute('class');
-				
+
 				$transformations = array(
 					AgaviXmlConfigParser::STAGE_SINGLE => array(),
 					AgaviXmlConfigParser::STAGE_COMPILATION => array(),
@@ -85,7 +85,7 @@ class AgaviConfigHandlersConfigHandler extends AgaviXmlConfigHandler
 						$transformations[$for][] = $path;
 					}
 				}
-				
+
 				$validations = array(
 					AgaviXmlConfigParser::STAGE_SINGLE => array(
 						AgaviXmlConfigParser::STEP_TRANSFORMATIONS_BEFORE => array(
@@ -138,7 +138,7 @@ class AgaviConfigHandlersConfigHandler extends AgaviXmlConfigHandler
 						$validations[$for][$step][$type][] = $path;
 					}
 				}
-				
+
 				$handlers[$category] = isset($handlers[$category])
 					? $handlers[$category]
 					: array(
@@ -152,14 +152,14 @@ class AgaviConfigHandlersConfigHandler extends AgaviXmlConfigHandler
 				);
 			}
 		}
-		
+
 		$data = array(
 			'return ' . var_export($handlers, true),
 		);
-		
+
 		return $this->generate($data, $document->documentURI);
 	}
-	
+
 	/**
 	 * Convenience method to quickly guess the type of a validation file using its
 	 * file extension.

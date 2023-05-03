@@ -85,6 +85,8 @@ class AgaviStringValidator extends AgaviValidator
 			return false;
 		}
 
+		/* To fix the: 'non SGML character number 11' issue. */
+		$originalValue = preg_replace('/[\x1-\x8\xB-\xC\xE-\x1F]/', '', $originalValue);
 		$this->export($originalValue);
 
 		return true;

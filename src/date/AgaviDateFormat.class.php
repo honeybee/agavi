@@ -252,7 +252,7 @@ class AgaviDateFormat
 		if($data instanceof AgaviCalendar) {
 			$cal = $data;
 			$calNeedsClone = true;
-		} elseif($data instanceof DateTime) {
+		} elseif($data instanceof DateTimeInterface) {
 			$cal = $this->context->getTranslationManager()->createCalendar($data);
 		} elseif(is_int($data)) {
 			$cal = $this->context->getTranslationManager()->createCalendar($locale);

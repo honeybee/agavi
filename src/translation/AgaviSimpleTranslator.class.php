@@ -102,7 +102,7 @@ class AgaviSimpleTranslator extends AgaviBasicTranslator
 			$data = isset($this->currentData[(string)$domain][$message]) ? $this->currentData[(string)$domain][$message] : $message;
 		}
 
-		if($locale && $locale !== $this->locale) {
+		if(isset($oldLocale)) {
 			$this->currentData = $oldCurrentData;
 			$this->locale = $oldLocale;
 		}

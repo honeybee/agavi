@@ -48,7 +48,7 @@ class AgaviLocale extends AgaviParameterHolder
 	 * Returns the locale option string containing the timezone option set 
 	 * to the timezone of this calendar.
 	 * 
-	 * @param      AgaviCalendar|DateTime|int The item to determine the timezone
+	 * @param      AgaviCalendar|DateTimeInterface|int The item to determine the timezone
 	 *                                        from
 	 * @param      string The prefix which will be applied to the timezone option
 	 *                    string. Use ';' here if you intend to use several 
@@ -66,7 +66,7 @@ class AgaviLocale extends AgaviParameterHolder
 		$tzId = '';
 		if($item instanceof AgaviCalendar) {
 			$tzId = $item->getTimeZone()->getResolvedId();
-		} elseif($item instanceof DateTime) {
+		} elseif($item instanceof DateTimeInterface) {
 			$tzId = $item->getTimezone()->getName();
 			if(preg_match('/^[+-][0-9]+/', $tzId)) {
 				$tzId = 'GMT' . $tzId;

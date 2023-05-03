@@ -34,8 +34,8 @@
  */
 class AgaviDatabaseConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/databases/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/databases/1.0';
+
 	/**
 	 * Execute this configuration handler.
 	 *
@@ -55,16 +55,16 @@ class AgaviDatabaseConfigHandler extends AgaviXmlConfigHandler
 	{
 		// set up our default namespace
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'databases');
-		
+
 		$databases = array();
 		$default = null;
 		foreach($document->getConfigurationElements() as $configuration) {
 			if(!$configuration->hasChildren('databases')) {
 				continue;
 			}
-			
+
 			$databasesElement = $configuration->getChild('databases');
-			
+
 			// make sure we have a default database exists
 			if(!$databasesElement->hasAttribute('default') && $default === null) {
 				// missing default database

@@ -33,8 +33,8 @@
  */
 class AgaviLoggingConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/logging/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/logging/1.0';
+
 	/**
 	 * Execute this configuration handler.
 	 *
@@ -58,7 +58,7 @@ class AgaviLoggingConfigHandler extends AgaviXmlConfigHandler
 	{
 		// set up our default namespace
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'logging');
-		
+
 		// init our data, includes, methods, appenders and appenders arrays
 		$code      = array();
 		$loggers   = array();

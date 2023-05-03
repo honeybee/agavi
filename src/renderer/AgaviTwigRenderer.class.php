@@ -30,7 +30,7 @@
 class AgaviTwigRenderer extends AgaviRenderer implements AgaviIReusableRenderer
 {
 	/**
-	 * @var        Twig_Environment The template engine.
+	 * @var        \Twig\Environment The template engine.
 	 */
 	protected $twig = null;
 
@@ -80,28 +80,22 @@ class AgaviTwigRenderer extends AgaviRenderer implements AgaviIReusableRenderer
 	/**
 	 * Load and create an instance of Twig.
 	 *
-	 * @return     Twig_Environment
+	 * @return     \Twig\Environment
 	 *
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.6
 	 */
 	protected function createEngineInstance()
 	{
-		if(!class_exists('Twig_Environment')) {
-			if(!class_exists('Twig_Autoloader')) {
-				require('Twig/Autoloader.php');
-			}
-			Twig_Autoloader::register();
-		}
-		
 		// loader is set in render()
-		return new Twig_Environment(null, (array)$this->getParameter('options', array()));
+		$loader = new \Twig\Loader\FilesystemLoader([], AgaviConfig::get('core.template_dir'));
+		return new \Twig\Environment($loader, (array)$this->getParameter('options', array()));
 	}
 
 	/**
 	 * Grab an initialized Twig instance.
 	 *
-	 * @return     Twig_Environment
+	 * @return     \Twig\Environment
 	 *
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.0.6
@@ -150,15 +144,15 @@ class AgaviTwigRenderer extends AgaviRenderer implements AgaviIReusableRenderer
 			foreach((array)$this->getParameter('template_dirs', array(AgaviConfig::get('core.template_dir'))) as $dir) {
 				$paths[] = $dir;
 			}
-			$twig->setLoader(new Twig_Loader_Filesystem($paths));
+			$twig->setLoader(new \Twig\Loader\FilesystemLoader($paths));
 			$source = $pathinfo['basename'];
+			$template = $twig->loadTemplate($source);
 		} else {
 			// a stream template or whatever; either way, it's something Twig can't load directly :S
-			$twig->setLoader(new Twig_Loader_String());
 			$source = file_get_contents($path);
+			$template = $twig->createTemplate($source);
 		}
-		$template = $twig->loadTemplate($source);
-		
+
 		$data = array();
 		
 		// template vars

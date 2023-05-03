@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ae:configurations xmlns:ae="http://agavi.org/agavi/config/global/envelope/1.1" xmlns="http://agavi.org/agavi/config/parts/factories/1.1">
+<ae:configurations xmlns:ae="http://agavi.org/agavi/config/global/envelope/1.0" xmlns="http://agavi.org/agavi/config/parts/factories/1.0">
 	
 	<ae:configuration>
 		
@@ -10,8 +10,14 @@
 		<dispatch_filter class="AgaviDispatchFilter" />
 		
 		<execution_container class="AgaviExecutionContainer" />
-		
+
 		<execution_filter class="AgaviExecutionFilter" />
+
+		<action_execution_filter class="AgaviActionExecutionFilter" />
+
+		<authorization_filter class="AgaviAuthorizationFilter" />
+
+		<validation_filter class="AgaviValidationFilter" />
 		
 		<filter_chain class="AgaviFilterChain" />
 		

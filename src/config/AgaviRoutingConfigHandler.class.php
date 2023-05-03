@@ -31,13 +31,13 @@
  */
 class AgaviRoutingConfigHandler extends AgaviXmlConfigHandler
 {
-	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/routing/1.1';
-	
+	const XML_NAMESPACE = 'http://agavi.org/agavi/config/parts/routing/1.0';
+
 	/**
 	 * @var        array Stores the generated names of unnamed routes.
 	 */
 	protected $unnamedRoutes = array();
-	
+
 	/**
 	 * Execute this configuration handler.
 	 *
@@ -45,7 +45,7 @@ class AgaviRoutingConfigHandler extends AgaviXmlConfigHandler
 	 *
 	 * @return     string Data to be written to a cache file.
 	 *
-	 * @throws     <b>AgaviUnreadableException</b> If a requested configuration 
+	 * @throws     <b>AgaviUnreadableException</b> If a requested configuration
 	 *                                             file does not exist or is not
 	 *                                             readable.
 	 * @throws     <b>AgaviParseException</b> If a requested configuration file is
@@ -59,7 +59,7 @@ class AgaviRoutingConfigHandler extends AgaviXmlConfigHandler
 	{
 		// set up our default namespace
 		$document->setDefaultNamespace(self::XML_NAMESPACE, 'routing');
-		
+
 		$routing = AgaviContext::getInstance($this->context)->getRouting();
 
 		// reset the stored route names
@@ -67,7 +67,7 @@ class AgaviRoutingConfigHandler extends AgaviXmlConfigHandler
 
 		// clear the routing
 		$routing->importRoutes(array());
-		
+
 		foreach($document->getConfigurationElements() as $cfg) {
 			if($cfg->has('routes')) {
 				$this->parseRoutes($routing, $cfg->get('routes'));
@@ -80,7 +80,7 @@ class AgaviRoutingConfigHandler extends AgaviXmlConfigHandler
 		// because var_export() incorrectly escapes null-byte sequences as \000, which results in a corrupted string, and unserialize() doesn't like corrupted strings
 		// this was fixed in PHP 5.2.6, but we're compatible with 5.2.0+
 		// see http://bugs.php.net/bug.php?id=37262 and http://bugs.php.net/bug.php?id=42272
-		
+
 		return serialize($routing->exportRoutes());
 	}
 

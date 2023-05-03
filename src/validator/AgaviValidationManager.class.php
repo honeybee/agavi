@@ -56,7 +56,7 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 	const MODE_RELAXED = 'relaxed';
 
 	/**
-	 * All request variables are available when no validation defined else only 
+	 * All request variables are available when no validation defined else only
 	 * validated request variables are available.
 	 */
 	const MODE_CONDITIONAL = 'conditional';
@@ -105,7 +105,7 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 	{
 		return $this->context;
 	}
-	
+
 	/**
 	 * Retrieve the validation result report container of the last validation run.
 	 *
@@ -126,10 +126,10 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 	 * @param      array The argument names.
 	 * @param      array The error messages.
 	 * @param      array The validator parameters.
-	 * @param      AgaviIValidatorContainer The parent (will use the validation 
+	 * @param      AgaviIValidatorContainer The parent (will use the validation
 	 *                                      manager if null is given)
 	 * @return     AgaviValidator
-	 * 
+	 *
 	 * @author     Dominik del Bondio <ddb@bitxtender.com>
 	 * @since      0.11.0
 	 */
@@ -257,7 +257,7 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 		$success = true;
 		$this->report = new AgaviValidationReport();
 		$result = AgaviValidator::SUCCESS;
-		
+
 		$req = $this->context->getRequest();
 
 		$executedValidators = 0;
@@ -311,7 +311,7 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 		}
 
 		if($mode == self::MODE_STRICT || ($executedValidators > 0 && $mode == self::MODE_CONDITIONAL)) {
-			
+
 			// first, we explicitly unset failed arguments
 			// the primary purpose of this is to make sure that arrays that failed validation themselves (e.g. due to array length validation, or due to use of operator validators with an argument base) are removed
 			// that's of course only necessary if validation failed
@@ -319,7 +319,7 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 			foreach($failedArguments as $argument) {
 				$parameters->remove($argument->getSource(), $argument->getName());
 			}
-			
+
 			// next, we remove all arguments from the request data that are not in the list of succeeded arguments
 			// this will also remove any arguments that didn't have validation rules defined
 			$succeededArguments = $this->report->getSucceededArguments();
@@ -363,11 +363,11 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 			$this->addChild($validator);
 		}
 	}
-	
+
 	/**
 	 * Adds an incident to the validation result. This will automatically adjust
 	 * the field result table (which is required because one can still manually
-	 * add errors either via AgaviRequest::addError or by directly using this 
+	 * add errors either via AgaviRequest::addError or by directly using this
 	 * method)
 	 *
 	 * @param      AgaviValidationIncident The incident.
@@ -379,13 +379,13 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 	{
 		return $this->report->addIncident($incident);
 	}
-	
-	
+
+
 	/////////////////////////////////////////////////////////////////////////////
 	////////////////////////////// Deprecated Parts /////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////
-	
-	
+
+
 	/**
 	 * Returns the final validation result.
 	 *
@@ -399,11 +399,11 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 	public function getResult()
 	{
 		$result = $this->report->getResult();
-		
+
 		if(null === $result) {
 			$result = AgaviValidator::NOT_PROCESSED;
 		}
-		
+
 		return $result;
 	}
 
@@ -442,8 +442,8 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 	}
 
 	/**
-	 * Will return the highest error code for a field. This can be optionally 
-	 * limited to the highest error code of an validator. If the field was not 
+	 * Will return the highest error code for a field. This can be optionally
+	 * limited to the highest error code of an validator. If the field was not
 	 * "touched" by a validator null is returned.
 	 *
 	 * @param      string The name of the field.
@@ -499,7 +499,7 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 
 	/**
 	 * Returns all fields which succeeded in the validation. Includes fields which
-	 * were not processed (happens when the field is "not set" and the validator 
+	 * were not processed (happens when the field is "not set" and the validator
 	 * is not required)
 	 *
 	 * @param      string The source for which the fields should be returned.
@@ -518,13 +518,13 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 		foreach($arguments as $argument) {
 			$names[] = $argument->getName();
 		}
-		
+
 		return $names;
 	}
-	
+
 	/**
-	 * Checks if any incidents occurred Returns all fields which succeeded in the 
-	 * validation. Includes fields which were not processed (happens when the 
+	 * Checks if any incidents occurred Returns all fields which succeeded in the
+	 * validation. Includes fields which were not processed (happens when the
 	 * field is "not set" and the validator is not required)
 	 *
 	 * @param      int The minimum severity which shall be checked for.
@@ -584,7 +584,7 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 	public function getValidatorIncidents($validatorName, $minSeverity = null)
 	{
 		$incidents = $this->report->byValidator($validatorName)->getIncidents();
-		
+
 		if($minSeverity === null) {
 			return $incidents;
 		} else {
@@ -613,7 +613,7 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 	public function getFieldIncidents($fieldname, $minSeverity = null)
 	{
 		$incidents = $this->report->byArgument($fieldname)->getIncidents();
-		
+
 		if($minSeverity === null) {
 			return $incidents;
 		} else {
@@ -631,7 +631,7 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 	 * Returns all errors of a given field.
 	 *
 	 * @param      string The name of the field.
-	 * @param      int The minimum severity a returned incident of the error 
+	 * @param      int The minimum severity a returned incident of the error
 	 *                 needs to have.
 	 *
 	 * @return     array The errors.
@@ -655,7 +655,7 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 	 * Returns all errors of a given field in a given validator.
 	 *
 	 * @param      string The name of the field.
-	 * @param      int The minimum severity a returned incident of the error 
+	 * @param      int The minimum severity a returned incident of the error
 	 *                 needs to have.
 	 *
 	 * @return     array The incidents.
@@ -679,7 +679,7 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 	}
 
 	/**
-	 * Returns all failed fields (this are all fields including those with 
+	 * Returns all failed fields (this are all fields including those with
 	 * severity none and notice).
 	 *
 	 * @return     array The names of the fields.
@@ -696,10 +696,10 @@ class AgaviValidationManager extends AgaviParameterHolder implements AgaviIValid
 		foreach($this->getIncidents($minSeverity) as $incident) {
 			$fields = array_merge($fields, $incident->getFields());
 		}
-		
+
 		return array_values(array_unique($fields));
 	}
-	
+
 	/**
 	 * Retrieve an error message.
 	 *
