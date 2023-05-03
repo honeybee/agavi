@@ -29,6 +29,27 @@
 			</ae:parameters>
 		</execution_filter>
 
+		<action_execution_filter class="FCHTestActionExecutionFilter">
+			<ae:parameters>
+				<ae:parameter name="p1">v1</ae:parameter>
+				<ae:parameter name="p2">v2</ae:parameter>
+			</ae:parameters>
+		</action_execution_filter>
+
+		<authorization_filter class="FCHTestAuthorizationFilter">
+			<ae:parameters>
+				<ae:parameter name="p1">v1</ae:parameter>
+				<ae:parameter name="p2">v2</ae:parameter>
+			</ae:parameters>
+		</authorization_filter>
+
+		<validation_filter class="FCHTestValidationFilter">
+			<ae:parameters>
+				<ae:parameter name="p1">v1</ae:parameter>
+				<ae:parameter name="p2">v2</ae:parameter>
+			</ae:parameters>
+		</validation_filter>
+
 		<filter_chain class="FCHTestFilterChain">
 			<ae:parameters>
 				<ae:parameter name="p1">v1</ae:parameter>

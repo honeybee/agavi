@@ -12,6 +12,12 @@
 		<execution_container class="AgaviExecutionContainer" />
 		
 		<execution_filter class="AgaviExecutionFilter" />
+
+		<action_execution_filter class="AgaviActionExecutionFilter" />
+
+		<authorization_filter class="AgaviAuthorizationFilter" />
+
+		<validation_filter class="AgaviValidationFilter" />
 		
 		<filter_chain class="AgaviFilterChain" />
 		
