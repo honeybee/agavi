@@ -35,7 +35,7 @@ class AgaviResponseTest extends AgaviUnitTestCase
 {
 	private $_r = null;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->_r = new SampleResponse();
 		$this->_r->initialize($this->getContext());

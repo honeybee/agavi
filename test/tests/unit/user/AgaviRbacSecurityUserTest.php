@@ -38,7 +38,7 @@ class AgaviRbacSecurityUserTest extends AgaviUnitTestCase
 {
 	private $_u = null;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->_u = new SimpleRbacSecurityUser();
 		$this->_u->initialize($this->getContext());

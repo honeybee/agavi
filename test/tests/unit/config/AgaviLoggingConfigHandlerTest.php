@@ -63,7 +63,7 @@ class AgaviLoggingConfigHandlerTest extends ConfigHandlerTestBase
 {
 	protected $context;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->context = AgaviContext::getInstance();
 	}

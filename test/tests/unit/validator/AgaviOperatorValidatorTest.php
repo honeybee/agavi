@@ -14,13 +14,13 @@ class AgaviOperatorValidatorTest extends AgaviUnitTestCase
 	private $context;
 	private $vm;
 	
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->context = $this->getContext();
 		$this->vm = $this->context->createInstanceFor('validation_manager');
 	}
 	
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		$this->vm = null;
 		$this->context = null;

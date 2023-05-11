@@ -15,7 +15,7 @@ class AgaviWebRoutingServerCasesTest extends AgaviUnitTestCase
 		$this->export = $export;
 	}
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->_SERVER = $_SERVER;
 		$this->_ENV = $_ENV;
@@ -91,7 +91,7 @@ class AgaviWebRoutingServerCasesTest extends AgaviUnitTestCase
 	}
 
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		$_SERVER = $this->_SERVER;
 		$_ENV = $this->_ENV;

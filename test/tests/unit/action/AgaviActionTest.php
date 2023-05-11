@@ -10,13 +10,13 @@ class ActionTest extends AgaviUnitTestCase
 {
 	private $_action = null;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->_action = new SampleAction();
 		$this->_action->initialize($this->getContext()->getController()->createExecutionContainer('Foo', 'Bar'));
 	}
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		$this->_action = null;
 	}

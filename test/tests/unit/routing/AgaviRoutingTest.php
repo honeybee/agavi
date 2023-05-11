@@ -17,7 +17,7 @@ class AgaviRoutingTest extends AgaviPhpUnitTestCase
 		parent::__construct($name, $data, $dataName);
 	}
 	
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->routing = new AgaviTestingRouting();
 		$this->routing->initialize(AgaviContext::getInstance(null), $this->parameters);

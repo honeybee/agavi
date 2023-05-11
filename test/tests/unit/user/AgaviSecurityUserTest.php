@@ -17,7 +17,7 @@ class SecurityUserTest extends AgaviUnitTestCase
 {
 	private $_u = null;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->_u = new SampleSecurityUser();
 		$this->_u->initialize($this->getContext());

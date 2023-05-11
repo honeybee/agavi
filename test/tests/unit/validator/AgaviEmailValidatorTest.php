@@ -26,13 +26,13 @@ class AgaviEmailValidatorTest extends AgaviUnitTestCase
 {
 	protected $_vm, $validator;
 	
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->_vm = $this->getContext()->createInstanceFor('validation_manager');
 		$this->validator = $this->_vm->createValidator('EmailValidatorWrapper', array());
 	}
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		unset($this->validator);
 	}

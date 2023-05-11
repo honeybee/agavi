@@ -8,12 +8,12 @@ class AgaviDatabaseManagerTest extends AgaviUnitTestCase
 {
 	private $_dbm = null;
 	
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->_dbm = $this->getContext()->getDatabaseManager();
 	}
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		$this->_dbm = null;
 	}

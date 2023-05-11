@@ -20,7 +20,7 @@ class TimeZoneBoundaryTest extends BaseCalendarTest
 	protected $PST_1997_END;
 	protected $INTERVAL;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		parent::setUp();
 		$this->ONE_SECOND = 1000;

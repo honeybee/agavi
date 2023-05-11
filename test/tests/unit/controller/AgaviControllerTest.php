@@ -15,7 +15,7 @@ class AgaviControllerTest extends AgaviUnitTestCase
 {
 	protected $_controller = null;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		// ReInitialize the Context between tests to start fresh
 		$this->_context = $this->getContext();

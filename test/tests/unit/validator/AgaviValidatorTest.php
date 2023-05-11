@@ -41,12 +41,12 @@ class AgaviValidatorTest extends BaseValidatorTest
 {
 	private $_vm = null;
 					
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->_vm = $this->getContext()->createInstanceFor('validation_manager');
 	}
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		$this->_vm = null;
 	}

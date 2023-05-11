@@ -23,7 +23,7 @@ class AgaviWebResponseTest extends AgaviUnitTestCase
 	 */
 	private $_r = null;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->_r = new TestAgaviWebResponse();
 		$this->_r->initialize($this->getContext());

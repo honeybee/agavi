@@ -27,7 +27,7 @@ class BaseCalendarTest extends AgaviPhpUnitTestCase
 		return $format->format($time, 'gregorian', $this->tm->getCurrentLocale());
 	}
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->tm = AgaviContext::getInstance()->getTranslationManager();
 	}

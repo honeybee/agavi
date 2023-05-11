@@ -29,8 +29,7 @@ use PHPUnit\TextUI\Command;
  */
 class AgaviPhpUnitCli extends Command
 {
-
-	// protected array $options = [];
+	protected array $agaviArguments = [];
 
 	/**
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
@@ -38,15 +37,19 @@ class AgaviPhpUnitCli extends Command
 	 */
 	public function __construct()
 	{
+		# my-switch won't accept a value, it's an on/off
+		// $this->longOptions['my-switch'] = 'myHandler';
+		# my-secondswitch will accept a value - note the equals sign
+		// $this->longOptions['my-secondswitch='] = 'myOtherHandler';
 		$this->longOptions['environment='] = 'handleEnvironment';
 		$this->longOptions['include-suite='] = 'handleIncludeSuite';
 		$this->longOptions['exclude-suite='] = 'handleExcludeSuite';
 		$this->longOptions['no-expand-configuration'] = 'handleNoExpandConfiguration';
 
-		$this->arguments['agaviEnvironment'] = !empty($_SERVER['AGAVI_ENVIRONMENT']) ? $_SERVER['AGAVI_ENVIRONMENT'] : 'testing';
-		$this->arguments['agaviIncludeSuites'] = array();
-		$this->arguments['agaviExcludeSuites'] = array();
-		$this->arguments['agaviExpandConfiguration'] = true;
+		$this->agaviArguments['agaviEnvironment'] = !empty($_SERVER['AGAVI_ENVIRONMENT']) ? $_SERVER['AGAVI_ENVIRONMENT'] : 'testing';
+		$this->agaviArguments['agaviIncludeSuites'] = array();
+		$this->agaviArguments['agaviExcludeSuites'] = array();
+		$this->agaviArguments['agaviExpandConfiguration'] = true;
 	}
 
 	/**
@@ -59,7 +62,7 @@ class AgaviPhpUnitCli extends Command
 	 */
 	protected function handleEnvironment($value)
 	{
-		$this->arguments['agaviEnvironment'] = $value;
+		$this->agaviArguments['agaviEnvironment'] = $value;
 	}
 
 	/**
@@ -72,8 +75,8 @@ class AgaviPhpUnitCli extends Command
 	 */
 	protected function handleIncludeSuite($value)
 	{
-		$this->arguments['agaviIncludeSuites'] = array_merge(
-			$this->arguments['agaviIncludeSuites'],
+		$this->agaviArguments['agaviIncludeSuites'] = array_merge(
+			$this->agaviArguments['agaviIncludeSuites'] ?? [],
 			explode(',', $value)
 		);
 	}
@@ -88,8 +91,8 @@ class AgaviPhpUnitCli extends Command
 	 */
 	protected function handleExcludeSuite($value)
 	{
-		$this->arguments['agaviExcludeSuites'] = array_merge(
-			$this->arguments['agaviExcludeSuites'],
+		$this->agaviArguments['agaviExcludeSuites'] = array_merge(
+			$this->agaviArguments['agaviExcludeSuites'] ?? [],
 			explode(',', $value)
 		);
 	}
@@ -102,7 +105,7 @@ class AgaviPhpUnitCli extends Command
 	 */
 	protected function handleNoExpandConfiguration()
 	{
-		$this->arguments['agaviExpandConfiguration'] = false;
+		$this->agaviArguments['agaviExpandConfiguration'] = false;
 	}
 
 
@@ -169,7 +172,7 @@ EOT;
 		// ensure the bootstrap script doesn't run and bootstraps agavi another time
 		define('AGAVI_TESTING_BOOTSTRAPPED', true);
 		AgaviToolkit::clearCache();
-		$this->bootstrap($this->arguments['agaviEnvironment']);
+		$this->bootstrap($this->agaviArguments['agaviEnvironment']);
 
 
 		// use the default configuration only if another configuration was not given as command line argument
@@ -184,19 +187,27 @@ EOT;
 
 		$masterSuite = new AgaviTestSuite('Master');
 
-		if($this->arguments['agaviIncludeSuites']) {
-			foreach($this->arguments['agaviIncludeSuites'] as $name) {
+		if($this->agaviArguments['agaviIncludeSuites'] ?? []) {
+			foreach($this->agaviArguments['agaviIncludeSuites'] as $name) {
 				if(empty($suites[$name])) {
 					throw new InvalidArgumentException(sprintf('Invalid suite name %1$s.', $name));
 				}
 
 				$masterSuite->addTest(self::createSuite($name, $suites[$name]));
 			}
-		} else {
+		} elseif($this->agaviArguments['agaviExcludeSuites'] ?? []) {
 			foreach($suites as $name => $suite) {
-				if(!in_array($name, $this->arguments['agaviExcludeSuites'])) {
+				if(!in_array($name, $this->agaviArguments['agaviExcludeSuites'])) {
 					$masterSuite->addTest(self::createSuite($name, $suite));
 				}
+			}
+		} else {
+			foreach($suites as $name => $suite) {
+				if(empty($suite)) {
+					throw new InvalidArgumentException(sprintf('Invalid suite name %1$s.', $name));
+				}
+
+				$masterSuite->addTest(self::createSuite($name, $suite));
 			}
 		}
 

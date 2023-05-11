@@ -7,7 +7,7 @@ class AgaviUserTest extends AgaviUnitTestCase
 {
 	private $_u = null;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->_u = new SampleUser();
 		$context = AgaviContext::getInstance('test');

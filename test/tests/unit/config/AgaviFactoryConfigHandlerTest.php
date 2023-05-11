@@ -38,6 +38,16 @@ class FCHTestExecutionFilter    implements AgaviIActionFilter {
 	public function initialize(AgaviContext $context, array $parameters = array()) {}
 }
 
+class FCHTestActionExecutionFilter    implements AgaviIActionFilter {
+	public function executeOnce(AgaviFilterChain $filterChain, AgaviExecutionContainer $container) {}
+	public function execute(AgaviFilterChain $filterChain, AgaviExecutionContainer $container) {}
+	public final function getContext() {}
+	public function initialize(AgaviContext $context, array $parameters = array()) {}
+}
+
+class FCHTestAuthorizationFilter	extends FCHTestBase {}
+class FCHTestValidationFilter	extends FCHTestBase {}
+
 class FCHTestFilterChain        extends FCHTestBase {}
 class FCHTestLoggerManager      extends FCHTestBase {}
 class FCHTestRequest            extends FCHTestBase {}
@@ -80,13 +90,13 @@ class AgaviFactoryConfigHandlerTest extends ConfigHandlerTestBase
 							$routing,
 							$response;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->conf = AgaviConfig::toArray();
 		$this->factories = array();
 	}
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		AgaviConfig::clear();
 		AgaviConfig::fromArray($this->conf);
@@ -133,6 +143,33 @@ class AgaviFactoryConfigHandlerTest extends ConfigHandlerTestBase
 				'parameters' => $paramsExpected,
 			),
 			$this->factories['execution_filter']
+		);
+
+		// Action execution filter
+		$this->assertSame(
+			array(
+				'class' => 'FCHTestActionExecutionFilter',
+				'parameters' => $paramsExpected,
+			),
+			$this->factories['action_execution_filter']
+		);
+
+		// Authorization filter
+		$this->assertSame(
+			array(
+				'class' => 'FCHTestAuthorizationFilter',
+				'parameters' => $paramsExpected,
+			),
+			$this->factories['authorization_filter']
+		);
+
+		// Validation filter
+		$this->assertSame(
+			array(
+				'class' => 'FCHTestValidationFilter',
+				'parameters' => $paramsExpected,
+			),
+			$this->factories['validation_filter']
 		);
 
 		// Filter chain

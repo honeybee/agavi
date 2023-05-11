@@ -8,7 +8,7 @@ class AgaviNumberValidatorTest extends AgaviUnitTestCase
 	 */
 	protected $vm;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->vm = $this->getContext()->createInstanceFor('validation_manager');
 	}

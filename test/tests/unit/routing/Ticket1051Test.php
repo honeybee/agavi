@@ -17,7 +17,7 @@ class Ticket1051Test extends AgaviPhpUnitTestCase
 		parent::__construct($name, $data, $dataName);
 	}
 	
-	public function setUp()
+	public function setUp(): void
 	{
 		// otherwise, the full URI wouldn't work
 		$_SERVER['REQUEST_URI'] = '/index.php';

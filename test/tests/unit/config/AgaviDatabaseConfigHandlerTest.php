@@ -16,7 +16,7 @@ class AgaviDatabaseConfigHandlerTest extends ConfigHandlerTestBase
 	protected $databases;
 	protected $defaultDatabaseName;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->databases = array();
 	}

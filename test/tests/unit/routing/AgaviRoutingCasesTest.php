@@ -67,7 +67,7 @@ class AgaviRoutingCasesTest extends AgaviUnitTestCase
 	protected $_config = null;
 	protected $_context = null;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->_r = new SampleRouting();
 		$this->_r->initialize($this->getContext());

@@ -212,8 +212,8 @@ class AgaviConfigCacheTest extends AgaviPhpUnitTestCase
 		
 		$expected = AgaviConfig::get('core.cache_dir').DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR;
 		$expected .= 'foo.xml';
-		$expected .= '_'.preg_replace('/[^\w-_]/i', '_', AgaviConfig::get('core.environment'));
-		$expected .= '_'.preg_replace('/[^\w-_]/i', '_', $context).'_';
+		$expected .= '_'.preg_replace('/[^\w\-_]/i', '_', AgaviConfig::get('core.environment'));
+		$expected .= '_'.preg_replace('/[^\w\-_]/i', '_', $context).'_';
 		$expected .= sha1($config.'_'.AgaviConfig::get('core.environment').'_'.$context).'.php'; 
 		
 		$this->assertEquals($expected, $cachename);

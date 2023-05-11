@@ -11,7 +11,7 @@ class ViewTest extends AgaviUnitTestCase
 		$_v = null, 
 		$_r = null;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$ctx = $this->getContext();
 		$ctx->initialize();

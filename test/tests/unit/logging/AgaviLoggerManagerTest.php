@@ -13,7 +13,7 @@ class AgaviLoggerManagerTest extends AgaviUnitTestCase
 		$_l = null,
 		$_l2 = null;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->_context = $this->getContext();
 		$this->_lm = $this->_context->getLoggerManager();
@@ -36,7 +36,7 @@ class AgaviLoggerManagerTest extends AgaviUnitTestCase
 		$this->_l2->setAppender('fa2', $this->_fa2);
 	}
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		$this->_lm->shutdown();
 		@unlink($this->_logfile);

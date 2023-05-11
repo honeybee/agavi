@@ -9,12 +9,12 @@ class AgaviFormPopulationFilterTest extends AgaviUnitTestCase
 	private $_context;
 	
 	
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->_context = AgaviContext::getInstance('test');
 	}
 	
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		$this->_context = null;
 	}
