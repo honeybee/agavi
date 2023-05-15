@@ -946,7 +946,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 					$val = $this->toUtf8($val, $encoding);
 				}
 			} else {
-				$value = utf8_encode($value);
+				$value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1');
 			}
 		} else {
 			if(is_array($value)) {
@@ -980,7 +980,7 @@ class AgaviFormPopulationFilter extends AgaviFilter implements AgaviIGlobalFilte
 					$val = $this->fromUtf8($val, $encoding);
 				}
 			} else {
-				$value = utf8_decode($value);
+				$value = mb_convert_encoding($value, 'ISO-8859-1', 'UTF-8');
 			}
 		} else {
 			if(is_array($value)) {

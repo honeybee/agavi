@@ -133,10 +133,10 @@ class AgaviConfigParser
 	 */
 	protected function convertEncoding($value)
 	{
-		if($this->encoding == 'utf-8') {
+		if(strtolower($this->encoding) == 'utf-8') {
 			return $value;
-		} elseif($this->encoding == 'iso-8859-1') {
-			return utf8_decode($value);
+		} elseif(strtolower($this->encoding) == 'iso-8859-1') {
+			return mb_convert_encoding($value, "ISO-8859-1", mb_detect_encoding($value));
 		} elseif(function_exists('iconv')) {
 			return iconv('UTF-8', $this->encoding, $value);
 		} else {

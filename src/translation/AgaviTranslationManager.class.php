@@ -46,6 +46,11 @@ class AgaviTranslationManager
 	protected $translators = array();
 
 	/**
+	 * @var        array An array of the translator filters.
+	 */
+	protected $translatorFilters = array();
+
+	/**
 	 * @var        AgaviLocale The current locale.
 	 */
 	protected $currentLocale = null;

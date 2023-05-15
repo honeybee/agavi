@@ -101,7 +101,7 @@ class AgaviLdmlSupplementalConfigHandler extends AgaviXmlConfigHandler
 		foreach($dataTree->getChild('languageData') as $language) {
 			if($language->localName == 'language') {
 				$lang = $language->getAttribute('type');
-				$scripts = explode(' ', $language->getAttribute('scripts'));
+				$scripts = explode(' ', $language->getAttribute('scripts') ?? '');
 				$territories = explode(' ', $language->getAttribute('territories'));
 				$alt = $language->getAttribute('alt', 'primary');
 

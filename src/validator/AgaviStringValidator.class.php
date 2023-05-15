@@ -72,7 +72,8 @@ class AgaviStringValidator extends AgaviValidator
 		$value = $originalValue;
 		
 		if($utf8) {
-			$value = utf8_decode($value);
+			// decode from utf-8 to ISO-8859-1
+			$value = mb_convert_encoding($value, "ISO-8859-1", mb_detect_encoding($value));
 		}
 		
 		if($this->hasParameter('min') and strlen($value) < $this->getParameter('min')) {

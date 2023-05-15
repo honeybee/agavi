@@ -126,12 +126,11 @@ class AgaviConfigCacheTest extends AgaviPhpUnitTestCase
 	}
 	
 	/**
-	 * @expectedException AgaviUnreadableException
 	 * this does not seem to work in isolation
 	 */
 	public function testAddNonexistantConfigHandlersFile()
 	{
-		$this->setExpectedException('AgaviUnreadableException');
+		$this->expectException('AgaviUnreadableException');
 		AgaviConfigCache::addConfigHandlersFile('does/not/exist');
 	}
 	

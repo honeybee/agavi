@@ -75,21 +75,15 @@ class AgaviToolkitTest extends AgaviPhpUnitTestCase
 		$this->assertEquals(1, $rem);
 	}
 
-
-	/**
-	 * @expectedException
-	 */
 	public function testFloorDivideException()
 	{
 		$this->expectException(AgaviException::class);
 		AgaviToolkit::floorDivide(6.9, 3.4, $rem);
 	}
 
-	 /**
-	 * @expectedException Error
-	 */
 	public function testFloorDivideByZero()
 	{
+		$this->expectException(Error::class);
 		AgaviToolkit::floorDivide(10, 0, $rem);
 	}
 

@@ -14,6 +14,7 @@ class TestController extends AgaviController
 class AgaviControllerTest extends AgaviUnitTestCase
 {
 	protected $_controller = null;
+	protected $_context = null;
 
 	public function setUp(): void
 	{
@@ -55,10 +56,8 @@ class AgaviControllerTest extends AgaviUnitTestCase
 
 	}
 
-	/**
-	 * @expectedException AgaviFileNotFoundException
-	 */
 	public function testGetInvalidActionFromModule() {
+		$this->expectException(AgaviFileNotFoundException::class);
 		$this->_controller->createActionInstance('ControllerTests', 'NonExistant');
 	}
 

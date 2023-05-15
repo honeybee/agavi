@@ -51,6 +51,11 @@ class AgaviSchematronProcessor extends AgaviParameterHolder
 		'%core.agavi_dir%/config/schematron/iso_abstract_expand.xsl',
 		'%core.agavi_dir%/config/schematron/iso_svrl_for_xslt1.xsl'
 	);
+
+	/**
+	 * @var        array A cache of processor instances.
+	 */
+	protected $chain = array();
 	
 	/**
 	 * @var        DOMNode The node the processor will work on.

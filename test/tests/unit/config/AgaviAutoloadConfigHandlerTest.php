@@ -67,17 +67,13 @@ class AgaviAutoloadConfigHandlerTest extends ConfigHandlerTestBase
 		$this->assertEquals($expected, MyAutoloader::$namespaces);
 	}
 
-	/**
-	 * @expectedException AgaviParseException
-	 */
 	public function testClassMissing() {
+		$this->expectException(AgaviParseException::class);
 		$this->runHandler('test-class-missing');
 	}
 
-	/**
-	 * @expectedException AgaviParseException
-	 */
 	public function testNamespaceMissing() {
+		$this->expectException(AgaviParseException::class);
 		$this->runHandler('test-namespace-missing');
 	}
 

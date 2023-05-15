@@ -90,7 +90,7 @@ class AgaviSqlsrvDatabase extends AgaviDatabase
 				// even when UTF-8 is specified as the encoding for the connection, error messages will be returned in the local codepage in ext/sqlsrv 1.x
 				// (not just for connection failures, but also for failed queries etc)
 				// also, we need to convert the encoding for newer versions as well if the encoding on the connection was not UTF-8
-				$error['message'] = utf8_encode($error['message']);
+				$error['message'] = mb_convert_encoding($error['message'], "UTF-8", mb_detect_encoding($error['message']));
 			}
 			$error = sprintf('SQLSTATE %s (code %d): %s', $error['SQLSTATE'], $error['code'], $error['message']);
 		}

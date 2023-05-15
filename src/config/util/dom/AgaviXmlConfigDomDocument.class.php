@@ -100,7 +100,7 @@ class AgaviXmlConfigDomDocument extends DOMDocument
 	 * @author     Noah Fontes <noah.fontes@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function load($filename, $options = null)
+	public function load(string $filename, int $options = 0)
 	{
 		$luie = libxml_use_internal_errors(true);
 		libxml_clear_errors();
@@ -145,7 +145,7 @@ class AgaviXmlConfigDomDocument extends DOMDocument
 	 * @author     Noah Fontes <noah.fontes@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function loadXml($source, $options = null)
+	public function loadXML(string $source, int $options = 0)
 	{
 		$luie = libxml_use_internal_errors(true);
 		libxml_clear_errors();

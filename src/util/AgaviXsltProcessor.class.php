@@ -37,7 +37,7 @@ class AgaviXsltProcessor extends XSLTProcessor
 	 * @author     Noah Fontes <noah.fontes@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function importStylesheet($stylesheet)
+	public function importStylesheet($stylesheet): bool
 	{
 		$luie = libxml_use_internal_errors(true);
 		libxml_clear_errors();
@@ -64,6 +64,7 @@ class AgaviXsltProcessor extends XSLTProcessor
 		}
 
 		libxml_use_internal_errors($luie);
+		return true;
 	}
 
 	/**

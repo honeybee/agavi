@@ -54,7 +54,7 @@ class AgaviVirtualArrayPath
 	 */
 	public function __construct($path)
 	{
-		if(strlen($path) == 0) {
+		if(is_null($path) || strlen($path) == 0) {
 			$this->absolute = true;
 			return;
 		}

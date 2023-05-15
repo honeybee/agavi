@@ -82,11 +82,9 @@ class AgaviDatabaseConfigHandlerTest extends ConfigHandlerTestBase
 		
 		$this->assertSame('test1', $this->defaultDatabaseName);
 	}
-	
-	/**
-	 * @expectedException AgaviConfigurationException
-	 */
+
 	public function testNonExistentDefault() {
+		$this->expectException(AgaviConfigurationException::class);
 		$this->loadTestConfig('nonexistent-default');
 	}
 }

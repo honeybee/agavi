@@ -1790,15 +1790,15 @@ abstract class AgaviCalendar
 		// of the subclass algorithm.  They depend only on the local zone
 		// wall milliseconds in day.
 		$this->fFields[AgaviDateDefinitions::MILLISECONDS_IN_DAY] = $millisInDay;
-		$this->fFields[AgaviDateDefinitions::MILLISECOND] = $millisInDay % 1000;
+		$this->fFields[AgaviDateDefinitions::MILLISECOND] = fmod($millisInDay, 1000);
 		$millisInDay /= 1000;
-		$this->fFields[AgaviDateDefinitions::SECOND] = $millisInDay % 60;
+		$this->fFields[AgaviDateDefinitions::SECOND] = fmod($millisInDay, 60);
 		$millisInDay /= 60;
-		$this->fFields[AgaviDateDefinitions::MINUTE] = $millisInDay % 60;
+		$this->fFields[AgaviDateDefinitions::MINUTE] = fmod($millisInDay, 60);
 		$millisInDay /= 60;
 		$this->fFields[AgaviDateDefinitions::HOUR_OF_DAY] = (int) $millisInDay;
 		$this->fFields[AgaviDateDefinitions::AM_PM] = (int) ($millisInDay / 12); // Assume AM == 0
-		$this->fFields[AgaviDateDefinitions::HOUR] = $millisInDay % 12;
+		$this->fFields[AgaviDateDefinitions::HOUR] = fmod($millisInDay, 12);
 		$this->fFields[AgaviDateDefinitions::ZONE_OFFSET] = $rawOffset;
 		$this->fFields[AgaviDateDefinitions::DST_OFFSET] = $dstOffset;
 	}

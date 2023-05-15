@@ -562,7 +562,7 @@ We don't support the old aliases (yet)
 		
 		$s = $offset % 60;
 		$offset /= 60;
-		$m = $offset % 60;
+		$m = fmod($offset, 60);
 		$h = $offset / 60;
 		
 		$rv .= ($sign);
@@ -571,29 +571,29 @@ We don't support the old aliases (yet)
 		} else {
 			$rv .= chr(0x0030);
 		}
-		$rv .= chr(0x0030 + ($h%10));
+		$rv .= chr(intval(0x0030 + (fmod($h, 10))));
 		
 		if($insertSep) {
 			$rv .= chr(0x003A); /* ':' */
 		}
 		
 		if($m >= 10) {
-			$rv .= chr(0x0030 + ($m/10));
+			$rv .= chr(intval(0x0030 + ($m/10)));
 		} else {
 			$rv .= chr(0x0030);
 		}
-		$rv .= chr(0x0030 + ($m%10));
+		$rv .= chr(intval(0x0030 + (fmod($m, 10))));
 		
 		if($s) {
 			if($insertSep) {
 				$rv .= chr(0x003A); /* ':' */
 			}
 			if($s >= 10) {
-				$rv .= chr(0x0030 + ($s/10));
+				$rv .= chr(intval(0x0030 + ($s/10)));
 			} else {
 				$rv .= chr(0x0030);
 			}
-			$rv .= chr(0x0030 + ($s%10));
+			$rv .= chr(intval(0x0030 + ($s%10)));
 		}
 		return $rv;
 	}

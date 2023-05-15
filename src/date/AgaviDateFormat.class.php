@@ -488,7 +488,7 @@ class AgaviDateFormat
 							$sign = '-';
 						}
 
-						$value = ($value / 3) * 5 + ($value % 60); // minutes => KKmm
+						$value = ($value / 3) * 5 + fmod($value, 60); // minutes => KKmm
 						$out .= $sign . str_pad($value, 4, '0', STR_PAD_LEFT);
 					}
 					break;

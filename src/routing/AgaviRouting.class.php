@@ -1661,13 +1661,13 @@ abstract class AgaviRouting extends AgaviParameterHolder
 							$reverseStr .= sprintf('(:%s:)', $rxName);
 
 							if(!isset($vars[$rxName])) {
-								if(strpbrk($rxPrefix, $rxChars) !== false) {
+								if(strpbrk($rxPrefix ?? '', $rxChars) !== false) {
 									$rxPrefix = null;
 								}
-								if(strpbrk($rxInner, $rxChars) !== false) {
+								if(strpbrk($rxInner ?? '', $rxChars) !== false) {
 									$rxInner = null;
 								}
-								if(strpbrk($rxPostfix, $rxChars) !== false) {
+								if(strpbrk($rxPostfix ?? '', $rxChars) !== false) {
 									$rxPostfix = null;
 								}
 

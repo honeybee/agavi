@@ -2,6 +2,11 @@
 
 abstract class ConfigHandlerTestBase extends AgaviUnitTestCase
 {
+	/**
+	 * @var        array The array used for the shutdown sequence.
+	 */
+	protected $shutdownSequence = array();
+
 	protected function getIncludeFile($code)
 	{
 		$file = tempnam(AgaviConfig::get('core.cache_dir'), 'cht');
