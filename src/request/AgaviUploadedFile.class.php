@@ -196,7 +196,7 @@ class AgaviUploadedFile implements ArrayAccess
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.1.0
 	 */
-	public function offsetGet($key)
+	public function offsetGet($key): mixed
 	{
 		if($this->offsetExists($key)) {
 			$method = 'get' . self::$indexMap[$key];
