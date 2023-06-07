@@ -107,7 +107,7 @@ abstract class AgaviBaseFileValidator extends AgaviValidator
 				
 				$extensions = $this->getParameter('extension', array());
 				if(!is_array($extensions)) {
-					$extensions = explode(' ', $this->getParameter('extension'));
+					$extensions = explode(' ', (string)$this->getParameter('extension'));
 				}
 				
 				foreach($extensions as $extension) {

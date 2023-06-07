@@ -137,7 +137,7 @@ class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 
 		$arguments = array();
 
-		$stdMethod = $validator->getAttribute('method', $stdMethod);
+		$stdMethod = $validator->getAttribute('method') ?: $stdMethod;
 		$stdSeverity = $parameters['severity'];
 		if($validator->hasAttribute('name')) {
 			$name = $validator->getAttribute('name');
@@ -182,7 +182,7 @@ class AgaviValidatorConfigHandler extends AgaviXmlConfigHandler
 		}
 
 		$methods = array('');
-		if(trim($stdMethod)) {
+		if(trim((string)$stdMethod)) {
 			$methods = preg_split('/[\s]+/', $stdMethod);
 		}
 

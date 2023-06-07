@@ -554,7 +554,7 @@ array data format
 					$data['timeZoneNames']['abbreviationFallback'] = $tzn->abbreviationFallback->getAttribute('choice');
 				}
 				if(isset($tzn->singleCountries)) {
-					$data['timeZoneNames']['singleCountries'] = explode(' ', $tzn->singleCountries->getAttribute('list'));
+					$data['timeZoneNames']['singleCountries'] = explode(' ', (string)$tzn->singleCountries->getAttribute('list'));
 				}
 
 				foreach($tzn as $zone) {

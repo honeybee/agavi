@@ -526,7 +526,7 @@ class AgaviConfigCache
 				return;
 			}
 		}
-		
+
 		// still here?
 		// that means we could not write the cache file
 		$error = 'Failed to write cache file "%s" generated from ' . 'configuration file "%s".';

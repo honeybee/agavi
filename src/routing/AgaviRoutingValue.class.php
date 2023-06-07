@@ -330,7 +330,7 @@ class AgaviRoutingValue implements AgaviIRoutingValue
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function offsetExists($offset)
+	public function offsetExists($offset): bool
 	{
 		return isset(self::$arrayMap[$offset]);
 	}
@@ -345,7 +345,7 @@ class AgaviRoutingValue implements AgaviIRoutingValue
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function offsetGet($offset)
+	public function offsetGet($offset): bool
 	{
 		if(isset(self::$arrayMap[$offset])) {
 			return $this->{self::$arrayMap[$offset]};
@@ -361,7 +361,7 @@ class AgaviRoutingValue implements AgaviIRoutingValue
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function offsetSet($offset, $value)
+	public function offsetSet($offset, $value): void
 	{
 		if(isset(self::$arrayMap[$offset])) {
 			$this->{self::$arrayMap[$offset]} = $value;
@@ -376,7 +376,7 @@ class AgaviRoutingValue implements AgaviIRoutingValue
 	 * @author     Dominik del Bondio <dominik.del.bondio@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function offsetUnset($offset)
+	public function offsetUnset($offset): void
 	{
 		if(isset(self::$arrayMap[$offset])) {
 			$this->{self::$arrayMap[$offset]} = null;

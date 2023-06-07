@@ -135,12 +135,14 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 	 */
 	public function getIterator(): Traversable
 	{
+		/** @var $ownerDocument AgaviXmlConfigDomElement */
+		$ownerDocument = $this->ownerDocument;
 		// should only pull elements from the default ns
-		$prefix = $this->ownerDocument->getDefaultNamespacePrefix();
+		$prefix = $ownerDocument->getDefaultNamespacePrefix();
 		if($prefix) {
-			return $this->ownerDocument->getXpath()->query(sprintf('child::%s:*', $prefix), $this);
+			return $ownerDocument->getXpath()->query(sprintf('child::%s:*', $prefix), $this);
 		} else {
-			return $this->ownerDocument->getXpath()->query('child::*', $this);
+			return $ownerDocument->getXpath()->query('child::*', $this);
 		}
 	}
 
@@ -517,7 +519,9 @@ class AgaviXmlConfigDomElement extends DOMElement implements IteratorAggregate
 		$result = $existing;
 		$offset = 0;
 
-		if($this->ownerDocument->isAgaviConfiguration()) {
+		/** @var $ownerDocument AgaviXmlConfigDomElement */
+		$ownerDocument = $this->ownerDocument;
+		if($ownerDocument->isAgaviConfiguration()) {
 			$elements = $this->get('parameters', AgaviXmlConfigParser::NAMESPACE_AGAVI_ENVELOPE_LATEST);
 
 			foreach($elements as $element) {

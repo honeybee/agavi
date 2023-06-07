@@ -363,7 +363,7 @@ abstract class AgaviTimeZone
 		$str .=		str_pad((int) ($value / AgaviDateDefinitions::MILLIS_PER_HOUR), 2, '0', STR_PAD_LEFT)
 						. $separator
 						. str_pad((int) (($value % AgaviDateDefinitions::MILLIS_PER_HOUR) / AgaviDateDefinitions::MILLIS_PER_MINUTE),  2, '0', STR_PAD_LEFT);
-		$offsetSeconds = ((int) ($value / AgaviDateDefinitions::MILLIS_PER_SECOND) % 60);
+		$offsetSeconds = (int) fmod($value / AgaviDateDefinitions::MILLIS_PER_SECOND, 60);
 		if($offsetSeconds) {
 			$str .= $separator . str_pad($offsetSeconds, 2, '0', STR_PAD_LEFT);
 		}

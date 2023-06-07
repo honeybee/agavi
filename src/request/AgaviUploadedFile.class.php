@@ -177,7 +177,7 @@ class AgaviUploadedFile implements ArrayAccess
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.1.0
 	 */
-	public function offsetExists($key)
+	public function offsetExists($key): bool
 	{
 		if(in_array($key, array('name', 'type', 'size', 'tmp_name', 'error', 'is_uploaded_file'))) {
 			$property = self::$indexMap[$key];
@@ -215,7 +215,7 @@ class AgaviUploadedFile implements ArrayAccess
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.1.0
 	 */
-	public function offsetSet($key, $value)
+	public function offsetSet($key, $value): void
 	{
 		throw new BadMethodCallException('AgaviUploadedFile objects are immutable.');
 	}
@@ -230,7 +230,7 @@ class AgaviUploadedFile implements ArrayAccess
 	 * @author     David Zülke <david.zuelke@bitextender.com>
 	 * @since      1.1.0
 	 */
-	public function offsetUnset($key)
+	public function offsetUnset($key): void
 	{
 		throw new BadMethodCallException('AgaviUploadedFile objects are immutable.');
 	}

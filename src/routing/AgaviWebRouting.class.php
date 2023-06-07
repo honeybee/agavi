@@ -254,7 +254,7 @@ class AgaviWebRouting extends AgaviRouting
 	{
 		$req = $this->context->getRequest();
 
-		if(substr($route, -1) == '*') {
+		if(substr((string)$route, -1) == '*') {
 			$options['refill_all_parameters'] = true;
 			$route = substr($route, 0, -1);
 		}
@@ -429,7 +429,7 @@ class AgaviWebRouting extends AgaviRouting
 	 */
 	public function escapeOutputParameter($string)
 	{
-		return rawurlencode($string);
+		return rawurlencode((string)$string);
 	}
 
 }

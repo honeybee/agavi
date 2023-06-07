@@ -610,7 +610,7 @@ abstract class AgaviCalendar
 					$gap = $max - $min + 1;
 
 					$value = $this->internalGet($field) + $amount;
-					$value = ($value - $min) % $gap;
+					$value = fmod(($value - $min), $gap);
 					if($value < 0) {
 						$value += $gap;
 					}

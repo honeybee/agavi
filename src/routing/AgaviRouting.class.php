@@ -803,7 +803,7 @@ abstract class AgaviRouting extends AgaviParameterHolder
 			} elseif($hasDefault) {
 				// now we just need to check if there are defaults for this available param and fill them in if applicable
 				$default = $defaultParams[$name];
-				if(!$isOptional || strlen($default->getValue()) > 0) {
+				if(!$isOptional || strlen((string)$default->getValue()) > 0) {
 					$finalParams[$name] = clone $default;
 				} elseif($isOptional) {
 					// there is no default or incoming match for this optional param, so remove it
@@ -1521,6 +1521,9 @@ abstract class AgaviRouting extends AgaviParameterHolder
 					}
 				}
 			}
+		}
+		if ($input == null) {
+			return false;
 		}
 		return preg_match($route['rxp'], $input, $matches, PREG_OFFSET_CAPTURE);
 	}

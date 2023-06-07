@@ -180,9 +180,10 @@ EOT;
 		if(empty($this->arguments['configuration']) && is_file($defaultConfigPath)) {
 			$this->arguments['configuration'] = $defaultConfigPath;
 		}
-
+		
 		$this->arguments['configuration'] = $this->expandConfiguration($this->arguments['configuration']);
-
+		
+// die($this->arguments['configuration']);
 		$suites = require(AgaviConfigCache::checkConfig(AgaviConfig::get('core.testing_dir') . '/config/suites.xml'));
 
 		$masterSuite = new AgaviTestSuite('Master');
