@@ -267,14 +267,16 @@ class AgaviXmlConfigDomDocument extends DOMDocument
 	/**
 	 * Validate a document based on a schema.
 	 *
-	 * @param      string The path to the schema.
+     * @param string $filename
+     * @param null $flags
+     * @param      string The path to the schema.
 	 *
 	 * @return     bool True if the validation is successful; false otherwise.
 	 *
 	 * @author     Noah Fontes <noah.fontes@bitextender.com>
 	 * @since      1.0.0
 	 */
-	public function schemaValidate($filename): bool
+	public function schemaValidate($filename, $flags = null): bool
 	{
 		$luie = libxml_use_internal_errors(true);
 		libxml_clear_errors();
